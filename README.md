@@ -22,11 +22,57 @@ A markdown-aware directory listing tool for the terminal.
 
 A must-have terminal tool for anyone working with Markdown-heavy projects — documentation writers, knowledge base managers, and developers who live in the terminal.
 
-## Why "lsmd"?
+## Why lsmd?
 
-**lsmd** stands for **List Markdown**. Just like `ls` lists files, **lsmd** lists files — but with Markdown intelligence. It knows the difference between a file with frontmatter, a file with just an H1 heading, and a plain text file. See metadata at a glance, not after opening.
+### The Problem
+
+With `ls`, all you see is a list of file names. To know what `meeting-2026-03.md` contains, you have to open it. When you have 50, 100, or 500 markdown files, this means opening files one by one just to find what you're looking for.
+
+```
+% ls
+api-design.md    debugging-checklist.txt  markdown-style.md     quick-reference.txt
+cli-ux-tips.md   git-workflow.md          project-kickoff.md    rust-error-handling.md
+```
+
+File names alone tell you almost nothing. What tags does `api-design.md` have? When was `project-kickoff.md` written? What is `quick-reference.txt` about?
+
+### The Solution
+
+**lsmd** reads the content and shows you the answers — without opening a single file.
+
+- **`.md` files**: Parses YAML frontmatter and displays **title**, **date**, and **tags** as colored badges inline. If there's no frontmatter, it falls back to the first `# H1` heading.
+- **`.txt` files**: Shows the **first line** as a dimmed preview, so you instantly know what the file is about.
+
+```
+% lsmd
+  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
+  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
+  debugging-checklist.txt  Step-by-step debugging checklist for production incidents
+  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
+  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
+  quick-reference.txt  Common terminal shortcuts and commands for daily developmen…
+  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
+```
+
+Now you can see at a glance: what each document is about, when it was written, and what topics it covers — all from a single command.
+
+### Built for PKM (Personal Knowledge Management)
+
+If you manage a personal knowledge base with tools like Obsidian, Logseq, Dendron, or plain markdown files, **lsmd** is your terminal companion. PKM workflows rely heavily on **frontmatter tags** and **titles** to organize knowledge — but `ls` ignores all of that.
+
+With lsmd:
+
+- **Navigate your vault from the terminal** — see titles, dates, and tags without launching a GUI
+- **Find notes by tag** — pipe to `grep` to instantly locate all notes tagged `#rust` or `#meeting`
+- **Scan before you open** — know what's inside 100 files without opening any of them
+- **Review at a glance** — quickly check if your notes have proper frontmatter and tags
+- **Combine with Unix tools** — `grep`, `awk`, `sort` for powerful ad-hoc queries across your knowledge base
 
 > *Don't just list files. List meaning.*
+
+<p align="center">
+  <img src="images/lsmd.png" alt="lsmd screenshot" width="600" />
+</p>
 
 ## Features
 
@@ -233,6 +279,10 @@ Key behaviors:
 - **Other files** listed plainly without icons
 
 ### 2. Long Format (`-l`)
+
+<p align="center">
+  <img src="images/lsmd-l.png" alt="lsmd -l screenshot" width="600" />
+</p>
 
 ```
 % lsmd playground -l

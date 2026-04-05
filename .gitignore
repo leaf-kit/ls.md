@@ -1,5 +1,99 @@
-/target
+# ===== Build =====
+/target/
+**/*.rs.bk
+*.d
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.dSYM/
+*.tar.gz
+*.zip
+
+# ===== Cargo =====
+.build_number
+
+# ===== Editor / IDE =====
 *.swp
 *.swo
 *~
+*.bak
+*.orig
+*.tmp
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+tags
+TAGS
+
+# ===== OS =====
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ===== Credentials / Secrets =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.secret
+*.credentials
+credentials.json
+secrets.json
+token.json
+*.gpg
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+known_hosts
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== Claude / AI Tool =====
+CLAUDE.md
+.claude/
+.claude_*
+.anthropic/
+.cursorrules
+.cursor/
+.copilot/
+.github/copilot/
+
+# ===== Allow playground/ test samples =====
+!playground/**/CLAUDE.md
+!playground/**/.claude/
+!playground/**/.claude/**
+!playground/**/.cursor/
+!playground/**/.cursor/**
+!playground/**/.cursorrules
+
+# ===== Misc =====
+.cache/
+.local/
+core
+.history/
+.npm/
+node_modules/

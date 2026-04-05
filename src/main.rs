@@ -43,6 +43,10 @@ pub struct Cli {
     /// Show only .md and .txt files
     #[arg(short = 'm', long = "md-only")]
     pub md_only: bool,
+
+    /// Show only the first # heading for .md files (no frontmatter details)
+    #[arg(short = 't', long = "title")]
+    pub title_only: bool,
 }
 
 fn main() {

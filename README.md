@@ -15,7 +15,7 @@
 
 Production-ready, structure-aware directory listing for Markdown-heavy workflows.
 
-> **v0.2.0 Released** — [GitHub Release](https://github.com/leaf-kit/ls.md/releases/tag/v0.2.0) | [Homebrew Tap](https://github.com/leaf-kit/homebrew-lsmd)
+> **v0.2.1 Released** — [GitHub Release](https://github.com/leaf-kit/ls.md/releases/tag/v0.2.1) | [Homebrew Tap](https://github.com/leaf-kit/homebrew-lsmd)
 >
 > ```bash
 > brew tap leaf-kit/lsmd && brew install lsmd
@@ -447,16 +447,47 @@ The `playground/best-practices/` directory contains well-structured Markdown doc
   debugging-checklist.txt  Step-by-step debugging checklist for production incidents
 ```
 
+### 7. Title Only (`-t`)
+
+Show only the first `#` heading from `.md` files, without frontmatter details (date, tags). Useful for a quick overview of document titles in a large collection.
+
+```
+% lsmd playground/best-practices -t
+  api-design.md           RESTful API Design Principles
+  cli-ux-tips.md          CLI UX Design Tips
+  debugging-checkli….txt  Step-by-step debugging checklist for production incidents
+  git-workflow.md         Git Workflow Guide
+  markdown-style.md       Markdown Writing Style Guide
+  project-kickoff.md      Project Kickoff Checklist
+  quick-reference.txt     Common terminal shortcuts and commands for daily developmen…
+  rust-error-handling.md  Rust Error Handling Patterns
+```
+
+Combined with long format:
+
+```
+% lsmd playground/best-practices -t -l
+ .rw-r--r--   744 B 2026-04-05 02:08  api-design.md           RESTful API Design Principles
+ .rw-r--r--   773 B 2026-04-05 02:09  cli-ux-tips.md          CLI UX Design Tips
+ .rw-r--r--   403 B 2026-04-05 02:09  debugging-checkli….txt  Step-by-step debugging checklist for production incidents
+ .rw-r--r--   697 B 2026-04-05 02:08  git-workflow.md         Git Workflow Guide
+ .rw-r--r--   737 B 2026-04-05 02:09  markdown-style.md       Markdown Writing Style Guide
+ .rw-r--r--   532 B 2026-04-05 02:08  project-kickoff.md      Project Kickoff Checklist
+ .rw-r--r--   381 B 2026-04-05 02:09  quick-reference.txt     Common terminal shortcuts and commands for daily developmen…
+ .rw-r--r--   836 B 2026-04-05 02:08  rust-error-handling.md  Rust Error Handling Patterns
+```
+
 ## Options Reference
 
 | Option | Short | Description |
 |--------|-------|-------------|
 | `--all` | `-a` | Show hidden files (dotfiles) |
-| `--long` | `-l` | Long format with size, date, metadata |
+| `--long` | `-l` | Long format with permissions, size, date, metadata |
 | `--no-color` | | Disable ANSI color output |
 | `--sort <FIELD>` | `-s` | Sort by: `name`, `size`, `modified`, `type` |
 | `--reverse` | `-r` | Reverse sort order |
 | `--md-only` | `-m` | Show only `.md` and `.txt` files |
+| `--title` | `-t` | Show only the first `#` heading for `.md` files |
 
 ## Content Preview Policy
 

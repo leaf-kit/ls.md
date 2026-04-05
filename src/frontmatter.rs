@@ -107,6 +107,47 @@ pub fn parse_md(path: &Path) -> MdMeta {
     meta
 }
 
+/// Extract just the first # heading from a .md file (for --title mode).
+pub fn extract_first_heading(path: &Path) -> Option<String> {
+    let file = File::open(path).ok()?;
+    let reader = BufReader::new(file);
+    let mut in_frontmatter = false;
+
+    for (i, line) in reader.lines().enumerate() {
+        if i >= MAX_LINES {
+            break;
+        }
+        let line = match line {
+            Ok(l) => l,
+            Err(_) => break,
+        };
+        let trimmed = line.trim();
+
+        // Skip frontmatter block
+        if i == 0 && trimmed == "---" {
+            in_frontmatter = true;
+            continue;
+        }
+        if in_frontmatter {
+            if trimmed == "---" {
+                in_frontmatter = false;
+            }
+            continue;
+        }
+
+        // Match any heading level: #, ##, ###, etc.
+        if let Some(rest) = trimmed.strip_prefix('#') {
+            let heading = rest.trim_start_matches('#').trim();
+            let cleaned = sanitize_preview(heading);
+            if !cleaned.is_empty() {
+                return Some(cleaned);
+            }
+        }
+    }
+
+    None
+}
+
 /// Format metadata as inline summary string.
 pub fn format_md_summary(meta: &MdMeta) -> String {
     let mut parts: Vec<String> = Vec::new();

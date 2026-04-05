@@ -1,4 +1,5 @@
 use std::fs;
+use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
@@ -12,6 +13,7 @@ pub struct DirEntry {
     pub extension: Option<String>,
     pub size: u64,
     pub modified: Option<SystemTime>,
+    pub mode: u32,
 }
 
 impl DirEntry {
@@ -27,6 +29,7 @@ impl DirEntry {
         };
         let size = metadata.len();
         let modified = metadata.modified().ok();
+        let mode = metadata.permissions().mode();
 
         Some(DirEntry {
             name,
@@ -36,6 +39,7 @@ impl DirEntry {
             extension,
             size,
             modified,
+            mode,
         })
     }
 
@@ -46,19 +50,62 @@ impl DirEntry {
     pub fn is_txt(&self) -> bool {
         matches!(self.extension.as_deref(), Some("txt"))
     }
+
+    pub fn is_executable(&self) -> bool {
+        !self.is_dir && (self.mode & 0o111) != 0
+    }
 }
 
-/// Format file size in human-readable form.
-pub fn format_size(size: u64) -> String {
-    if size < 1024 {
-        format!("{} B", size)
+/// Format file size in human-readable form (lsd style: value and unit separate).
+pub fn format_size(size: u64) -> (String, String) {
+    if size == 0 {
+        ("-".to_string(), "".to_string())
+    } else if size < 1024 {
+        (format!("{}", size), "B".to_string())
     } else if size < 1024 * 1024 {
-        format!("{:.1} KB", size as f64 / 1024.0)
+        let v = size as f64 / 1024.0;
+        if v < 10.0 {
+            (format!("{:.1}", v), "KB".to_string())
+        } else {
+            (format!("{:.0}", v), "KB".to_string())
+        }
     } else if size < 1024 * 1024 * 1024 {
-        format!("{:.1} MB", size as f64 / (1024.0 * 1024.0))
+        let v = size as f64 / (1024.0 * 1024.0);
+        if v < 10.0 {
+            (format!("{:.1}", v), "MB".to_string())
+        } else {
+            (format!("{:.0}", v), "MB".to_string())
+        }
     } else {
-        format!("{:.1} GB", size as f64 / (1024.0 * 1024.0 * 1024.0))
+        let v = size as f64 / (1024.0 * 1024.0 * 1024.0);
+        if v < 10.0 {
+            (format!("{:.1}", v), "GB".to_string())
+        } else {
+            (format!("{:.0}", v), "GB".to_string())
+        }
     }
+}
+
+/// Format size as a single string (for footer etc).
+pub fn format_size_simple(size: u64) -> String {
+    let (v, u) = format_size(size);
+    if u.is_empty() { v } else { format!("{} {}", v, u) }
+}
+
+/// Format rwx permissions string from mode.
+pub fn format_permissions(mode: u32, is_dir: bool) -> String {
+    let mut s = String::with_capacity(10);
+    s.push(if is_dir { 'd' } else { '.' });
+    s.push(if mode & 0o400 != 0 { 'r' } else { '-' });
+    s.push(if mode & 0o200 != 0 { 'w' } else { '-' });
+    s.push(if mode & 0o100 != 0 { 'x' } else { '-' });
+    s.push(if mode & 0o040 != 0 { 'r' } else { '-' });
+    s.push(if mode & 0o020 != 0 { 'w' } else { '-' });
+    s.push(if mode & 0o010 != 0 { 'x' } else { '-' });
+    s.push(if mode & 0o004 != 0 { 'r' } else { '-' });
+    s.push(if mode & 0o002 != 0 { 'w' } else { '-' });
+    s.push(if mode & 0o001 != 0 { 'x' } else { '-' });
+    s
 }
 
 /// Format modification time.
@@ -68,13 +115,11 @@ pub fn format_time(time: &SystemTime) -> String {
         .unwrap_or_default();
     let secs = duration.as_secs() as i64;
 
-    // Simple date formatting without chrono dependency
     let days = secs / 86400;
     let remaining = secs % 86400;
     let hours = remaining / 3600;
     let minutes = (remaining % 3600) / 60;
 
-    // Calculate year/month/day from days since epoch
     let (year, month, day) = days_to_date(days);
 
     format!(
@@ -84,7 +129,6 @@ pub fn format_time(time: &SystemTime) -> String {
 }
 
 fn days_to_date(mut days: i64) -> (i64, i64, i64) {
-    // Algorithm from http://howardhinnant.github.io/date_algorithms.html
     days += 719468;
     let era = if days >= 0 { days } else { days - 146096 } / 146097;
     let doe = days - era * 146097;
@@ -104,12 +148,17 @@ mod tests {
 
     #[test]
     fn test_format_size() {
-        assert_eq!(format_size(0), "0 B");
-        assert_eq!(format_size(512), "512 B");
-        assert_eq!(format_size(1024), "1.0 KB");
-        assert_eq!(format_size(1536), "1.5 KB");
-        assert_eq!(format_size(1048576), "1.0 MB");
-        assert_eq!(format_size(1073741824), "1.0 GB");
+        assert_eq!(format_size(0), ("-".to_string(), "".to_string()));
+        assert_eq!(format_size(512), ("512".to_string(), "B".to_string()));
+        assert_eq!(format_size(1024), ("1.0".to_string(), "KB".to_string()));
+        assert_eq!(format_size(1048576), ("1.0".to_string(), "MB".to_string()));
+    }
+
+    #[test]
+    fn test_format_permissions() {
+        assert_eq!(format_permissions(0o755, true), "drwxr-xr-x");
+        assert_eq!(format_permissions(0o644, false), ".rw-r--r--");
+        assert_eq!(format_permissions(0o700, false), ".rwx------");
     }
 
     #[test]

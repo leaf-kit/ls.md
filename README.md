@@ -7,10 +7,13 @@
 [![Release](https://img.shields.io/github/v/release/leaf-kit/ls.md?label=release)](https://github.com/leaf-kit/ls.md/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
+[![GitHub Stars](https://img.shields.io/github/stars/leaf-kit/ls.md?style=social)](https://github.com/leaf-kit/ls.md/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/leaf-kit/ls.md?style=social)](https://github.com/leaf-kit/ls.md/network/members)
+[![GitHub Downloads](https://img.shields.io/github/downloads/leaf-kit/ls.md/total?label=downloads)](https://github.com/leaf-kit/ls.md/releases)
 [![Homebrew](https://img.shields.io/badge/homebrew-leaf--kit%2Flsmd-yellow.svg)](https://github.com/leaf-kit/homebrew-lsmd)
-[![Homebrew install](https://img.shields.io/badge/brew%20install-lsmd-success.svg)](https://github.com/leaf-kit/homebrew-lsmd)
+[![brew install](https://img.shields.io/badge/brew%20install-lsmd-success.svg)](https://github.com/leaf-kit/homebrew-lsmd)
 
-A markdown-aware directory listing tool for the terminal.
+Production-ready, structure-aware directory listing for Markdown-heavy workflows.
 
 > **v0.2.0 Released** — [GitHub Release](https://github.com/leaf-kit/ls.md/releases/tag/v0.2.0) | [Homebrew Tap](https://github.com/leaf-kit/homebrew-lsmd)
 >
@@ -18,9 +21,9 @@ A markdown-aware directory listing tool for the terminal.
 > brew tap leaf-kit/lsmd && brew install lsmd
 > ```
 
-**lsmd** is like `ls`, but it understands Markdown. It parses YAML frontmatter, extracts headings from `.md` files, previews `.txt` first lines, and shows colored tag badges — all inline with the file listing. Directories get a 📂 icon in blue, tags get hash-based color badges, and `.txt` previews are dimmed for clean readability.
+**lsmd** is a drop-in companion to `ls`, purpose-built for developers, technical writers, and PKM practitioners who work with Markdown daily. It parses YAML frontmatter, extracts headings, previews text files, and renders colored tag badges — all inline, in a single command. Designed for real-world document collections from dozens to thousands of files.
 
-A must-have terminal tool for anyone working with Markdown-heavy projects — documentation writers, knowledge base managers, and developers who live in the terminal.
+Built with Rust for speed and safety. Optimized with LTO. Zero runtime dependencies. Ships as a single static binary.
 
 ## Why lsmd?
 
@@ -40,18 +43,18 @@ File names alone tell you almost nothing. What tags does `api-design.md` have? W
 
 **lsmd** reads the content and shows you the answers — without opening a single file.
 
-- **`.md` files**: Parses YAML frontmatter and displays **title**, **date**, and **tags** as colored badges inline. If there's no frontmatter, it falls back to the first `# H1` heading.
+- **`.md` files**: Parses YAML frontmatter and displays **title**, **date**, and **tags** as colored badges inline. If there's no frontmatter, it falls back to the first `# H1` heading, then to the first meaningful body line.
 - **`.txt` files**: Shows the **first line** as a dimmed preview, so you instantly know what the file is about.
 
 ```
 % lsmd
-  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  debugging-checklist.txt  Step-by-step debugging checklist for production incidents
-  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  quick-reference.txt  Common terminal shortcuts and commands for daily developmen…
-  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
+  api-design.md         RESTful API Design Principles · 2026-03-15 ·  api   rest   design
+  cli-ux-tips.md        CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
+  debugging-check….txt  Step-by-step debugging checklist for production incidents
+  git-workflow.md       Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
+  project-kickoff.md    Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
+  quick-reference.txt   Common terminal shortcuts and commands for daily developmen…
+  rust-error-handl….md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
 ```
 
 Now you can see at a glance: what each document is about, when it was written, and what topics it covers — all from a single command.
@@ -67,6 +70,8 @@ With lsmd:
 - **Scan before you open** — know what's inside 100 files without opening any of them
 - **Review at a glance** — quickly check if your notes have proper frontmatter and tags
 - **Combine with Unix tools** — `grep`, `awk`, `sort` for powerful ad-hoc queries across your knowledge base
+
+Trusted by developers and writers who manage documentation repositories, Zettelkasten vaults, and engineering knowledge bases from the terminal.
 
 > *Don't just list files. List meaning.*
 
@@ -632,6 +637,22 @@ lsmd handles these scenarios gracefully:
 - **Non-existent paths** — clear error message
 - **Permission errors** — skipped silently
 - **Non-directory paths** — clear error message
+
+## Related Projects
+
+lsmd complements existing terminal tools in the Markdown ecosystem:
+
+- [**gmd**](https://github.com/leaf-kit/g.md) — Grep Markdown. Structure-aware search across Markdown documents.
+- [**lsd**](https://github.com/lsd-rs/lsd) — LSDeluxe. A modern `ls` with icons and colors (file-type aware, not content-aware).
+- [**exa/eza**](https://github.com/eza-community/eza) — A modern replacement for `ls` (metadata-focused, not Markdown-aware).
+
+lsmd fills the gap: it is the only `ls`-style tool that **reads inside** `.md` and `.txt` files to surface structured metadata inline.
+
+## Feedback & Contributing
+
+Contributions, issues, and feature requests are welcome. If lsmd is useful in your workflow, consider starring the repo — it helps others discover the project.
+
+[github.com/leaf-kit/ls.md/issues](https://github.com/leaf-kit/ls.md/issues)
 
 ## License
 

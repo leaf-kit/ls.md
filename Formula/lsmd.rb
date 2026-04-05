@@ -1,20 +1,14 @@
 class Lsmd < Formula
   desc "lsmd — List Markdown, a markdown-aware directory listing tool"
   homepage "https://github.com/leaf-kit/ls.md"
-  version "0.1.0"
+  url "https://github.com/leaf-kit/ls.md/archive/refs/tags/v0.1.0.tar.gz"
+  sha256 "c358eb2630fa5f9259324df725e9fd5865c27d43c46a6b540e113655558c7701"
+  license "MIT"
 
-  on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/leaf-kit/ls.md/releases/download/v0.1.0/lsmd-aarch64-apple-darwin.tar.gz"
-      sha256 "3098a97632c8331d51eb79e508acbcc71eb3cc0409ae8f79b4952eddc305a8ee"
-    else
-      url "https://github.com/leaf-kit/ls.md/releases/download/v0.1.0/lsmd-x86_64-apple-darwin.tar.gz"
-      sha256 "617e9fa68a4d766e39756013d5a9f79eb5778cb0f67d296f66a35b8b77a162a4"
-    end
-  end
+  depends_on "rust" => :build
 
   def install
-    bin.install "lsmd"
+    system "cargo", "install", *std_cargo_args
   end
 
   test do

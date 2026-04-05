@@ -1,8 +1,9 @@
 use std::cmp::Ordering;
 use std::fs;
 use std::path::Path;
+use std::time::SystemTime;
 
-use colored::Colorize;
+use colored::{Color, Colorize};
 use terminal_size::{Width, terminal_size};
 
 use crate::Cli;
@@ -12,9 +13,35 @@ use crate::icon::icon_for_entry;
 
 const NAME_COL_WIDTH: usize = 22;
 
+// ─── lsd ANSI-256 Color Palette ─────────────────────────────
+// Mapped from lsd source: src/color.rs / theme.rs
+
+const DIR_COLOR: Color = Color::TrueColor { r: 0, g: 135, b: 255 };       // DodgerBlue1 (33)
+const FILE_COLOR: Color = Color::TrueColor { r: 215, g: 215, b: 0 };      // Yellow3 (184)
+const EXEC_COLOR: Color = Color::TrueColor { r: 0, g: 215, b: 0 };        // Green3 (40)
+const GREY: Color = Color::TrueColor { r: 138, g: 138, b: 138 };          // Grey (245)
+
+// Size colors
+const SIZE_SMALL: Color = Color::TrueColor { r: 255, g: 255, b: 175 };    // Wheat1 (229)
+const SIZE_MEDIUM: Color = Color::TrueColor { r: 255, g: 175, b: 135 };   // LightSalmon1 (216)
+const SIZE_LARGE: Color = Color::TrueColor { r: 215, g: 135, b: 0 };      // Orange3 (172)
+
+// Date colors
+const DATE_RECENT: Color = Color::TrueColor { r: 0, g: 215, b: 0 };      // Green3 (40)
+const DATE_TODAY: Color = Color::TrueColor { r: 0, g: 215, b: 135 };      // SpringGreen2 (42)
+const DATE_OLD: Color = Color::TrueColor { r: 0, g: 175, b: 135 };        // DarkCyan (36)
+
+// Permission colors
+const PERM_READ: Color = Color::TrueColor { r: 0, g: 175, b: 0 };        // DarkGreen
+const PERM_WRITE: Color = Color::TrueColor { r: 175, g: 175, b: 0 };     // DarkYellow
+const PERM_EXEC: Color = Color::TrueColor { r: 175, g: 0, b: 0 };        // DarkRed
+
+// md/txt specific
+const MD_COLOR: Color = Color::TrueColor { r: 135, g: 215, b: 135 };     // Light green
+const TXT_COLOR: Color = Color::TrueColor { r: 215, g: 215, b: 175 };    // Warm white
+
 // ─── Public API ─────────────────────────────────────────────
 
-/// List directory contents according to CLI options.
 pub fn list_directory(cli: &Cli) -> Result<(), String> {
     let path = &cli.path;
 
@@ -47,7 +74,6 @@ pub fn list_directory(cli: &Cli) -> Result<(), String> {
 
 // ─── Header / Footer ───────────────────────────────────────
 
-/// Print summary header: path + counts.
 fn print_header(path: &Path, entries: &[DirEntry]) {
     let dir_count = entries.iter().filter(|e| e.is_dir).count();
     let file_count = entries.iter().filter(|e| !e.is_dir).count();
@@ -74,13 +100,12 @@ fn print_header(path: &Path, entries: &[DirEntry]) {
 
     println!(
         " {}  {}",
-        path_str.bright_blue().bold(),
-        format!("({})", parts.join(", ")).bright_black()
+        path_str.color(DIR_COLOR).bold(),
+        format!("({})", parts.join(", ")).color(GREY)
     );
     println!();
 }
 
-/// Print footer with totals.
 fn print_footer(entries: &[DirEntry]) {
     let total_size: u64 = entries.iter().map(|e| e.size).sum();
     println!(
@@ -90,31 +115,22 @@ fn print_footer(entries: &[DirEntry]) {
             entries.len(),
             format_size_simple(total_size)
         )
-        .bright_black()
+        .color(GREY)
     );
 }
 
 // ─── Name Column ────────────────────────────────────────────
 
-/// Format name into a fixed-width column. Returns (colored_string, visible_width).
 fn format_name_column(entry: &DirEntry) -> (String, usize) {
     let raw_name = &entry.name;
-    let is_dir_entry = entry.is_dir;
-
-    let display_raw = if is_dir_entry {
-        raw_name.clone()
-    } else {
-        raw_name.clone()
-    };
-
-    let visible_len = display_raw.chars().count();
+    let visible_len = raw_name.chars().count();
 
     if visible_len <= NAME_COL_WIDTH {
-        let colored = colorize_name(&display_raw, entry);
+        let colored = colorize_name(raw_name, entry);
         let pad = NAME_COL_WIDTH - visible_len;
         (format!("{}{}", colored, " ".repeat(pad)), NAME_COL_WIDTH)
     } else {
-        let truncated = if is_dir_entry {
+        let truncated = if entry.is_dir {
             let t: String = raw_name.chars().take(NAME_COL_WIDTH - 1).collect();
             format!("{}…", t)
         } else if let Some(dot_pos) = raw_name.rfind('.') {
@@ -140,54 +156,53 @@ fn format_name_column(entry: &DirEntry) -> (String, usize) {
 
 // ─── Icon ───────────────────────────────────────────────────
 
-/// Get colored icon string for an entry.
 fn format_icon(entry: &DirEntry) -> String {
     let icon = icon_for_entry(entry.extension.as_deref(), entry.is_dir, &entry.name);
 
     if entry.is_dir {
-        icon.bright_blue().bold().to_string()
+        icon.color(DIR_COLOR).bold().to_string()
     } else if entry.is_hidden {
-        icon.bright_black().to_string()
+        icon.color(GREY).to_string()
     } else if entry.is_md() {
-        icon.green().to_string()
+        icon.color(MD_COLOR).to_string()
     } else if entry.is_txt() {
-        icon.yellow().to_string()
+        icon.color(TXT_COLOR).to_string()
+    } else if entry.is_executable() {
+        icon.color(EXEC_COLOR).to_string()
     } else {
-        icon.bright_black().to_string()
+        icon.color(FILE_COLOR).to_string()
     }
 }
 
 // ─── Name Coloring ──────────────────────────────────────────
 
-/// Apply color to a name string based on entry type (lsd palette).
 fn colorize_name(name: &str, entry: &DirEntry) -> String {
     if entry.is_dir {
-        name.bright_blue().bold().to_string()
+        name.color(DIR_COLOR).bold().to_string()
     } else if entry.is_hidden {
-        name.bright_black().to_string()
+        name.color(GREY).to_string()
     } else if entry.is_md() {
-        name.green().to_string()
+        name.color(MD_COLOR).to_string()
     } else if entry.is_txt() {
-        name.yellow().to_string()
+        name.color(TXT_COLOR).to_string()
     } else if entry.is_executable() {
-        name.bright_green().bold().to_string()
+        name.color(EXEC_COLOR).bold().to_string()
     } else {
-        name.normal().to_string()
+        name.color(FILE_COLOR).to_string()
     }
 }
 
 // ─── Permissions Coloring ───────────────────────────────────
 
-/// Color each character of a permissions string (lsd style).
 fn color_permissions(perm: &str) -> String {
     perm.chars()
         .map(|c| match c {
-            'd' => "d".bright_blue().bold().to_string(),
-            '.' => ".".bright_black().to_string(),
-            'r' => "r".green().to_string(),
-            'w' => "w".yellow().to_string(),
-            'x' => "x".red().to_string(),
-            '-' => "-".bright_black().to_string(),
+            'd' => "d".color(DIR_COLOR).bold().to_string(),
+            '.' => ".".color(GREY).to_string(),
+            'r' => "r".color(PERM_READ).to_string(),
+            'w' => "w".color(PERM_WRITE).to_string(),
+            'x' => "x".color(PERM_EXEC).to_string(),
+            '-' => "-".color(GREY).to_string(),
             _ => c.to_string(),
         })
         .collect()
@@ -195,26 +210,41 @@ fn color_permissions(perm: &str) -> String {
 
 // ─── Size Coloring ──────────────────────────────────────────
 
-/// Color size value + unit by magnitude (lsd style).
 fn color_size_parts(val: &str, unit: &str, size: u64) -> String {
     if size == 0 {
-        format!("{}", val.bright_black())
-    } else if size < 1024 {
-        format!("{} {}", val.green(), unit.green())
+        format!("{}", val.color(GREY))
     } else if size < 1024 * 1024 {
-        format!("{} {}", val.yellow(), unit.yellow())
+        // < 1 MB: Wheat1
+        format!("{} {}", val.color(SIZE_SMALL), unit.color(SIZE_SMALL))
     } else if size < 1024 * 1024 * 1024 {
-        format!("{} {}", val.red(), unit.red())
+        // < 1 GB: LightSalmon1
+        format!("{} {}", val.color(SIZE_MEDIUM), unit.color(SIZE_MEDIUM))
     } else {
-        format!("{} {}", val.bright_red().bold(), unit.bright_red().bold())
+        // >= 1 GB: Orange3
+        format!("{} {}", val.color(SIZE_LARGE), unit.color(SIZE_LARGE))
     }
 }
 
 // ─── Date Coloring ──────────────────────────────────────────
 
-/// Color date string (lsd uses cyan tones).
-fn color_date(time_str: &str) -> String {
-    time_str.bright_black().to_string()
+fn color_date(time_str: &str, modified: Option<&SystemTime>) -> String {
+    let color = match modified {
+        Some(t) => {
+            let age = SystemTime::now()
+                .duration_since(*t)
+                .unwrap_or_default()
+                .as_secs();
+            if age < 3600 {
+                DATE_RECENT     // < 1 hour: Green3
+            } else if age < 86400 {
+                DATE_TODAY      // < 1 day: SpringGreen2
+            } else {
+                DATE_OLD        // older: DarkCyan
+            }
+        }
+        None => GREY,
+    };
+    time_str.color(color).to_string()
 }
 
 // ─── Collect & Sort ─────────────────────────────────────────
@@ -297,7 +327,6 @@ fn print_long(entries: &[DirEntry], title_only: bool) {
         .map(|(Width(w), _)| w as usize)
         .unwrap_or(80);
 
-    // Calculate max widths for alignment
     let max_size_val_len = entries
         .iter()
         .map(|e| {
@@ -330,20 +359,19 @@ fn print_long(entries: &[DirEntry], title_only: bool) {
         let size_pad_val = max_size_val_len - size_val.len();
         let size_pad_unit = max_size_unit_len - size_unit.len();
         let size_field = format!(
-            "{}{}{}{}",
+            "{}{}{}",
             " ".repeat(size_pad_val),
             colored_size,
             " ".repeat(size_pad_unit),
-            ""
         );
 
-        // Date
+        // Date (colored by recency)
         let time_str = entry
             .modified
             .as_ref()
             .map(format_time)
             .unwrap_or_else(|| "                ".to_string());
-        let colored_date = color_date(&time_str);
+        let colored_date = color_date(&time_str, entry.modified.as_ref());
 
         let summary = get_summary(entry, title_only);
 
@@ -372,10 +400,8 @@ fn get_summary(entry: &DirEntry, title_only: bool) -> String {
 
     if entry.is_md() {
         if title_only {
-            // --title mode: show only the first # heading
             if let Some(heading) = extract_first_heading(&entry.path) {
-                use colored::Colorize;
-                return heading.dimmed().to_string();
+                return heading.color(GREY).to_string();
             }
         } else {
             let meta = parse_md(&entry.path);

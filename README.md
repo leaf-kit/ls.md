@@ -25,6 +25,8 @@ Production-ready, structure-aware directory listing for Markdown-heavy workflows
 
 Built with Rust for speed and safety. Optimized with LTO. Zero runtime dependencies. Ships as a single static binary.
 
+📖 [한국어 문서 (Korean)](README_ko.md)
+
 ---
 
 ## Why lsmd? 🤔
@@ -505,6 +507,11 @@ playground/
 Contributions, issues, and feature requests are welcome. If lsmd is useful in your workflow, consider starring the repo — it helps others discover the project.
 
 [github.com/leaf-kit/ls.md/issues](https://github.com/leaf-kit/ls.md/issues)
+
+## Documentation
+
+- [English README](README.md) — This document
+- [한국어 README](README_ko.md) — Korean documentation
 
 ## License
 

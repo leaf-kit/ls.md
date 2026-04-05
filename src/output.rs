@@ -146,44 +146,14 @@ fn format_icon(entry: &DirEntry) -> String {
 
     if entry.is_dir {
         icon.bright_blue().bold().to_string()
+    } else if entry.is_hidden {
+        icon.bright_black().to_string()
     } else if entry.is_md() {
         icon.green().to_string()
     } else if entry.is_txt() {
         icon.yellow().to_string()
-    } else if entry.is_hidden {
-        icon.bright_black().to_string()
-    } else if entry.is_executable() {
-        icon.bright_green().to_string()
     } else {
-        icon_color_by_ext(icon, entry.extension.as_deref())
-    }
-}
-
-/// Color icon by file extension.
-fn icon_color_by_ext(icon: &str, ext: Option<&str>) -> String {
-    match ext.map(|e| e.to_lowercase()).as_deref() {
-        Some("rs")                      => icon.red().to_string(),
-        Some("py")                      => icon.yellow().to_string(),
-        Some("js" | "mjs" | "cjs")    => icon.yellow().to_string(),
-        Some("ts" | "tsx")             => icon.bright_blue().to_string(),
-        Some("json")                    => icon.yellow().to_string(),
-        Some("yaml" | "yml")           => icon.magenta().to_string(),
-        Some("toml")                    => icon.red().to_string(),
-        Some("html" | "htm")           => icon.red().to_string(),
-        Some("css" | "scss" | "sass")  => icon.cyan().to_string(),
-        Some("sh" | "bash" | "zsh")   => icon.green().to_string(),
-        Some("go")                      => icon.cyan().to_string(),
-        Some("java" | "kt")           => icon.red().to_string(),
-        Some("rb")                      => icon.red().to_string(),
-        Some("swift")                   => icon.red().to_string(),
-        Some("c" | "h" | "cpp" | "hpp") => icon.blue().to_string(),
-        Some("lock")                    => icon.bright_black().to_string(),
-        Some("png" | "jpg" | "jpeg" | "gif" | "svg" | "webp") => icon.magenta().to_string(),
-        Some("pdf")                     => icon.red().to_string(),
-        Some("zip" | "tar" | "gz" | "7z") => icon.red().to_string(),
-        Some("mp3" | "wav" | "flac")   => icon.magenta().to_string(),
-        Some("mp4" | "mkv" | "avi")    => icon.magenta().to_string(),
-        _                               => icon.bright_black().to_string(),
+        icon.bright_black().to_string()
     }
 }
 

@@ -1,0 +1,9 @@
+Step-by-step debugging checklist for production incidents
+1. Reproduce the issue locally
+2. Check logs for error messages and stack traces
+3. Identify the exact commit that introduced the change
+4. Write a failing test that captures the bug
+5. Fix the root cause, not the symptom
+6. Verify the fix passes all existing tests
+7. Deploy to staging and validate
+8. Document the incident and lessons learned

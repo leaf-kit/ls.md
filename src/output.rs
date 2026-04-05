@@ -7,7 +7,7 @@ use terminal_size::{Width, terminal_size};
 use crate::Cli;
 use crate::entry::{DirEntry, format_size, format_time};
 use crate::frontmatter::{format_md_summary, parse_md, read_txt_preview};
-use crate::icon::{dir_icon, icon_for_ext};
+use crate::icon::dir_icon;
 
 /// List directory contents according to CLI options.
 pub fn list_directory(cli: &Cli) -> Result<(), String> {
@@ -97,26 +97,17 @@ fn print_default(entries: &[DirEntry]) {
         .unwrap_or(80);
 
     for entry in entries {
-        let icon = if entry.is_dir {
-            dir_icon()
-        } else {
-            entry
-                .extension
-                .as_deref()
-                .map(icon_for_ext)
-                .unwrap_or("\u{1F4C1}")
-        };
-
         let name = format_name(entry);
         let summary = get_summary(entry);
 
-        let line = if summary.is_empty() {
-            format!("{} {}", icon, name)
+        let line = if entry.is_dir {
+            format!("{} {}", dir_icon(), name)
+        } else if summary.is_empty() {
+            format!("  {}", name)
         } else {
-            format!("{} {}  {}", icon, name, summary)
+            format!("  {}  {}", name, summary)
         };
 
-        // Truncate to terminal width (approximate, ANSI codes make exact hard)
         println!("{}", truncate_visible(&line, term_width));
     }
 }
@@ -135,16 +126,6 @@ fn print_long(entries: &[DirEntry]) {
         .unwrap_or(4);
 
     for entry in entries {
-        let icon = if entry.is_dir {
-            dir_icon()
-        } else {
-            entry
-                .extension
-                .as_deref()
-                .map(icon_for_ext)
-                .unwrap_or("\u{1F4C1}")
-        };
-
         let name = format_name(entry);
         let size = format_size(entry.size);
         let time = entry
@@ -155,10 +136,16 @@ fn print_long(entries: &[DirEntry]) {
 
         let summary = get_summary(entry);
 
+        let prefix = if entry.is_dir {
+            format!("{}", dir_icon())
+        } else {
+            " ".to_string()
+        };
+
         let line = if summary.is_empty() {
             format!(
                 "{} {:>width$}  {}  {}",
-                icon,
+                prefix,
                 size.dimmed(),
                 time.dimmed(),
                 name,
@@ -167,7 +154,7 @@ fn print_long(entries: &[DirEntry]) {
         } else {
             format!(
                 "{} {:>width$}  {}  {}  {}",
-                icon,
+                prefix,
                 size.dimmed(),
                 time.dimmed(),
                 name,

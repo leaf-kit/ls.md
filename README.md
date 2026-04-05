@@ -85,9 +85,11 @@ Trusted by developers and writers who manage documentation repositories, Zettelk
 - **Tag color badges** — hash-based consistent coloring per tag
 - **H1 heading fallback** — when no frontmatter, show the first heading
 - **`.txt` first-line preview** — dimmed, truncated at 60 chars
-- **Column-aligned output** — file names fit a fixed 20-char column; long names are truncated with `…` preserving the extension; metadata starts at the same column for every line
-- **Clean output** — 📂 icon for directories only, no emoji clutter on files
-- **Directory-first sorting** — directories always listed first, in cyan
+- **Nerd Font icons** — file-type specific icons with extension-based coloring (`.rs` red, `.py` yellow, `.json` yellow, `.yaml` magenta, etc.)
+- **Column-aligned output** — file names fit a fixed 22-char column; long names truncated with `…` preserving extension
+- **Header & footer** — directory path with summary counts (dirs, files, md, txt) and total size
+- **Size coloring** — green (bytes), yellow (KB), red (MB+) in long format
+- **Directory-first sorting** — directories always listed first, bright blue bold
 - **Hidden file support** — `-a` flag to show dotfiles
 - **Long format** — `-l` for size, modification time, and metadata
 - **Markdown-only filter** — `-m` to show only `.md` and `.txt` files
@@ -259,32 +261,38 @@ All examples below are actual outputs from running `lsmd` against the included `
 
 ```
 % lsmd playground
-📂 best-practices/
-📂 docs/
-  app.py
-  blog-post.md          Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-  broken-yaml.md        Broken YAML Frontmatter Test
-  config.yaml
-  empty.md
-  empty.txt
-  long-line.txt         This is a very long first line that should be truncated wit…
-  meeting-notes.md      Team Meeting Notes · 2026-04-01 ·  meeting   planning
-  no-frontmatter.md     Simple Document
-  notes.txt             Quick notes from today's brainstorming session about the ne…
-  sample.json
-  short.md              Short
-  very-long-filena….md  Long Name Test · 2026-04-05 ·  test
+  /path/to/playground  (2 dirs, 13 files, 7 md, 3 txt)
+
+   best-practices/
+   docs/
+   app.py
+   blog-post.md            Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
+   broken-yaml.md          Broken YAML Frontmatter Test
+   config.yaml
+   empty.md
+   empty.txt
+   long-line.txt           This is a very long first line that should be truncated wit…
+   meeting-notes.md        Team Meeting Notes · 2026-04-01 ·  meeting   planning
+   no-frontmatter.md       Simple Document
+   notes.txt               Quick notes from today's brainstorming session about the ne…
+   sample.json
+   short.md                Short
+   very-long-filename….md  Long Name Test · 2026-04-05 ·  test
+
+  Total: 15 items, 2.4 KB
 ```
 
 Key behaviors:
-- **Directories** listed first with 📂 icon (`best-practices/`, `docs/`)
-- **Files** listed without emoji, clean indentation
-- **`.md` with frontmatter** shows title · date · tag badges (`blog-post.md`)
-- **`.md` without frontmatter** shows H1 heading (`no-frontmatter.md`)
-- **`.md` with broken YAML** falls back to body text (`broken-yaml.md` → "Broken YAML Frontmatter Test")
-- **`.md` empty file** no extra info (`empty.md`)
-- **`.txt` files** show dimmed first-line preview, sanitized and truncated at 60 chars
-- **Other files** listed plainly without icons
+- **Header** shows directory path with summary counts (dirs, files, md, txt)
+- **Nerd Font icons** per file type — colored by extension (requires [Nerd Fonts](https://www.nerdfonts.com/))
+- **Directories** listed first with folder icon in yellow
+- **`.md` files** in green with markdown icon and frontmatter summary
+- **`.md` without frontmatter** shows H1 heading or first body line as fallback
+- **`.md` with broken YAML** falls back to body text
+- **`.txt` files** in white with dimmed first-line preview (sanitized, 60 char truncation)
+- **Other files** with extension-specific icon and color
+- **Footer** shows total items and combined size
+- **22-char name column** — long names truncated with `…`, preserving extension
 
 ### 2. Long Format (`-l`)
 
@@ -478,8 +486,8 @@ lsmd extracts a one-line summary from `.md` and `.txt` files. The preview text i
 | `.md` empty | file name only |
 | `.txt` | dimmed first meaningful line (sanitized, max 60 chars) |
 | `.txt` empty | file name only |
-| Other files | file name only |
-| Directories | 📂 icon, cyan bold name, always listed first |
+| Other files | extension-colored Nerd Font icon, normal name |
+| Directories | yellow folder icon, bright blue bold name, always listed first |
 
 ## Pipe Integration (`|`)
 

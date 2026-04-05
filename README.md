@@ -12,11 +12,10 @@
 
 A markdown-aware directory listing tool for the terminal.
 
-> **v0.1.0 Released** — [GitHub Release](https://github.com/leaf-kit/ls.md/releases/tag/v0.1.0)
+> **v0.1.0 Released** — [GitHub Release](https://github.com/leaf-kit/ls.md/releases/tag/v0.1.0) | [Homebrew Tap](https://github.com/leaf-kit/homebrew-lsmd)
 >
 > ```bash
-> git clone https://github.com/leaf-kit/ls.md.git
-> cd ls.md && ./build.sh
+> brew tap leaf-kit/lsmd && brew install lsmd
 > ```
 
 **lsmd** is like `ls`, but it understands Markdown. It parses YAML frontmatter, extracts headings from `.md` files, previews `.txt` first lines, and shows colored tag badges — all inline with the file listing. Directories get a 📂 icon in blue, tags get hash-based color badges, and `.txt` previews are dimmed for clean readability.
@@ -48,6 +47,13 @@ A must-have terminal tool for anyone working with Markdown-heavy projects — do
 
 ## Installation
 
+### Homebrew (macOS)
+
+```bash
+brew tap leaf-kit/lsmd
+brew install lsmd
+```
+
 ### Build from Source
 
 ```bash
@@ -67,6 +73,14 @@ The build script provides a menu with options for debug/release builds, local in
 
 ## Update
 
+### Homebrew
+
+```bash
+brew upgrade lsmd
+```
+
+### From Source
+
 ```bash
 git pull origin main
 cargo build --release
@@ -74,6 +88,15 @@ cp target/release/lsmd /usr/local/bin/
 ```
 
 ## Uninstall
+
+### Homebrew
+
+```bash
+brew uninstall lsmd
+brew untap leaf-kit/lsmd
+```
+
+### Manual (source install)
 
 ```bash
 rm /usr/local/bin/lsmd

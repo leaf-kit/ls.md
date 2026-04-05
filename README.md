@@ -25,7 +25,7 @@ Production-ready, structure-aware directory listing for Markdown-heavy workflows
 
 Built with Rust for speed and safety. Optimized with LTO. Zero runtime dependencies. Ships as a single static binary.
 
-## Why lsmd?
+## Why lsmd? 
 
 ### The Problem
 
@@ -39,7 +39,7 @@ cli-ux-tips.md   git-workflow.md          project-kickoff.md    rust-error-handl
 
 File names alone tell you almost nothing. What tags does `api-design.md` have? When was `project-kickoff.md` written? What is `quick-reference.txt` about?
 
-### The Solution
+### The Solution 💡
 
 **lsmd** reads the content and shows you the answers — without opening a single file.
 
@@ -59,17 +59,17 @@ File names alone tell you almost nothing. What tags does `api-design.md` have? W
 
 Now you can see at a glance: what each document is about, when it was written, and what topics it covers — all from a single command.
 
-### Built for PKM (Personal Knowledge Management)
+### Built for PKM (Personal Knowledge Management) 🧠
 
 If you manage a personal knowledge base with tools like Obsidian, Logseq, Dendron, or plain markdown files, **lsmd** is your terminal companion. PKM workflows rely heavily on **frontmatter tags** and **titles** to organize knowledge — but `ls` ignores all of that.
 
 With lsmd:
 
-- **Navigate your vault from the terminal** — see titles, dates, and tags without launching a GUI
-- **Find notes by tag** — pipe to `grep` to instantly locate all notes tagged `#rust` or `#meeting`
-- **Scan before you open** — know what's inside 100 files without opening any of them
-- **Review at a glance** — quickly check if your notes have proper frontmatter and tags
-- **Combine with Unix tools** — `grep`, `awk`, `sort` for powerful ad-hoc queries across your knowledge base
+- 🗂️ **Navigate your vault from the terminal** — see titles, dates, and tags without launching a GUI
+- 🔍 **Find notes by tag** — pipe to `grep` to instantly locate all notes tagged `#rust` or `#meeting`
+- 👀 **Scan before you open** — know what's inside 100 files without opening any of them
+- ✅ **Review at a glance** — quickly check if your notes have proper frontmatter and tags
+- 🔗 **Combine with Unix tools** — `grep`, `awk`, `sort` for powerful ad-hoc queries across your knowledge base
 
 Trusted by developers and writers who manage documentation repositories, Zettelkasten vaults, and engineering knowledge bases from the terminal.
 
@@ -79,27 +79,28 @@ Trusted by developers and writers who manage documentation repositories, Zettelk
   <img src="images/lsmd.png" alt="lsmd screenshot" width="100%" />
 </p>
 
-## Features
+## Features ✨
 
-- **YAML frontmatter parsing** — show title, date, and tags inline
-- **Tag color badges** — hash-based consistent coloring per tag
-- **H1 heading fallback** — when no frontmatter, show the first heading
-- **`.txt` first-line preview** — dimmed, truncated at 60 chars
-- **Nerd Font icons** — file-type specific icons with extension-based coloring (`.rs` red, `.py` yellow, `.json` yellow, `.yaml` magenta, etc.)
-- **Column-aligned output** — file names fit a fixed 22-char column; long names truncated with `…` preserving extension
-- **Header & footer** — directory path with summary counts (dirs, files, md, txt) and total size
-- **Size coloring** — green (bytes), yellow (KB), red (MB+) in long format
-- **Directory-first sorting** — directories always listed first, bright blue bold
-- **Hidden file support** — `-a` flag to show dotfiles
-- **Long format** — `-l` for size, modification time, and metadata
-- **Markdown-only filter** — `-m` to show only `.md` and `.txt` files
-- **Sorting options** — by name, size, modified time, or type
-- **Reverse sort** — `-r` flag
-- **Auto color detection** — disables ANSI in non-TTY (pipe-safe)
-- **`--no-color` flag** — explicit color disable
-- Fast startup — written in Rust, optimized with LTO
+- 📋 **YAML frontmatter parsing** — show title, date, and tags inline
+- 🏷️ **Tag color badges** — hash-based consistent coloring per tag
+- 📝 **H1 heading fallback** — when no frontmatter, show the first heading
+- 📄 **`.txt` first-line preview** — dimmed, truncated at 60 chars
+- 🎨 **Nerd Font icons** — 60+ file-type icons with extension-based coloring
+- 📐 **Column-aligned output** — 22-char name column; long names truncated with `…` preserving extension
+- 📊 **Header & footer** — directory path with summary counts and total size
+- 🔒 **Permission display** — colored rwx permissions in long format
+- 🌈 **Size coloring** — green (B), yellow (KB), red (MB+) in long format
+- 📁 **Directory-first sorting** — always listed first, bright blue bold
+- 👁️ **Hidden file support** — `-a` flag to show dotfiles
+- 📑 **Long format** — `-l` with permissions, size, date, metadata
+- 🔤 **Title-only mode** — `-t` to show just the first `#` heading
+- 📂 **Markdown-only filter** — `-m` to show only `.md` and `.txt` files
+- ↕️ **Sorting options** — by name, size, modified time, or type
+- 🔄 **Reverse sort** — `-r` flag
+- 🖥️ **Auto color detection** — disables ANSI in non-TTY (pipe-safe)
+- ⚡ Fast startup — written in Rust, optimized with LTO
 
-## Installation
+## Installation 📦
 
 ### Homebrew (macOS)
 
@@ -156,7 +157,7 @@ brew untap leaf-kit/lsmd
 rm /usr/local/bin/lsmd
 ```
 
-## Playground
+## Playground 🎮
 
 The repository includes a `playground/` directory with sample files for testing every feature. It contains mixed file types, edge cases, and a curated `best-practices/` subdirectory showcasing rich frontmatter with tags.
 
@@ -196,7 +197,7 @@ playground/
 └── sample.json               # Non-markdown file
 ```
 
-## Usage
+## Usage 🚀
 
 ```
 % lsmd
@@ -253,7 +254,7 @@ Discussion:
     or `lsmd -l` for detailed metadata view.
 ```
 
-## Commands & Output Examples
+## Commands & Output Examples 📸
 
 All examples below are actual outputs from running `lsmd` against the included `playground/` directory.
 
@@ -477,7 +478,7 @@ Combined with long format:
  .rw-r--r--   836 B 2026-04-05 02:08  rust-error-handling.md  Rust Error Handling Patterns
 ```
 
-## Options Reference
+## Options Reference ⚙️
 
 | Option | Short | Description |
 |--------|-------|-------------|
@@ -489,7 +490,7 @@ Combined with long format:
 | `--md-only` | `-m` | Show only `.md` and `.txt` files |
 | `--title` | `-t` | Show only the first `#` heading for `.md` files |
 
-## Content Preview Policy
+## Content Preview Policy 📖
 
 lsmd extracts a one-line summary from `.md` and `.txt` files. The preview text is **sanitized** — special characters (`*`, `[`, `]`, `` ` ``, `#`, `|`, `{`, `}`, `<`, `>`, etc.) are stripped, keeping only readable text: alphanumeric characters, Korean, Chinese, Japanese, and basic punctuation (`.` `,` `!` `?` `:` `-`). This ensures clean, scannable output.
 
@@ -520,7 +521,7 @@ lsmd extracts a one-line summary from `.md` and `.txt` files. The preview text i
 | Other files | extension-colored Nerd Font icon, normal name |
 | Directories | yellow folder icon, bright blue bold name, always listed first |
 
-## Pipe Integration (`|`)
+## Pipe Integration (`|`) 🔧
 
 lsmd auto-disables ANSI colors when output is piped, making it safe for use with `grep`, `awk`, `wc`, `sort`, `sed`, `xargs`, and other Unix tools. All examples below were tested against `playground/best-practices/`.
 
@@ -666,7 +667,7 @@ Rust Error Handling Patterns
 
 5. **Encoding: lsmd outputs UTF-8.** If piping to tools that expect ASCII, use `LC_ALL=en_US.UTF-8` if needed.
 
-## Edge Cases
+## Edge Cases 🛡️
 
 lsmd handles these scenarios gracefully:
 
@@ -677,7 +678,7 @@ lsmd handles these scenarios gracefully:
 - **Permission errors** — skipped silently
 - **Non-directory paths** — clear error message
 
-## Related Projects
+## Related Projects 🔗
 
 lsmd complements existing terminal tools in the Markdown ecosystem:
 
@@ -687,7 +688,7 @@ lsmd complements existing terminal tools in the Markdown ecosystem:
 
 lsmd fills the gap: it is the only `ls`-style tool that **reads inside** `.md` and `.txt` files to surface structured metadata inline.
 
-## Feedback & Contributing
+## Feedback & Contributing 💬
 
 Contributions, issues, and feature requests are welcome. If lsmd is useful in your workflow, consider starring the repo — it helps others discover the project.
 

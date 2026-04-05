@@ -25,11 +25,13 @@ Production-ready, structure-aware directory listing for Markdown-heavy workflows
 
 Built with Rust for speed and safety. Optimized with LTO. Zero runtime dependencies. Ships as a single static binary.
 
-## Why lsmd? 
+---
+
+## Why lsmd? 🤔
 
 ### The Problem
 
-With `ls`, all you see is a list of file names. To know what `meeting-2026-03.md` contains, you have to open it. When you have 50, 100, or 500 markdown files, this means opening files one by one just to find what you're looking for.
+With `ls`, all you see is a list of file names:
 
 ```
 % ls
@@ -37,33 +39,28 @@ api-design.md    debugging-checklist.txt  markdown-style.md     quick-reference.
 cli-ux-tips.md   git-workflow.md          project-kickoff.md    rust-error-handling.md
 ```
 
-File names alone tell you almost nothing. What tags does `api-design.md` have? When was `project-kickoff.md` written? What is `quick-reference.txt` about?
+> What tags does `api-design.md` have? When was `project-kickoff.md` written?
+> What is `quick-reference.txt` about? **You have to open each file to find out.**
 
 ### The Solution 💡
 
-**lsmd** reads the content and shows you the answers — without opening a single file.
+**lsmd** reads the content and shows you the answers — without opening a single file:
 
-- **`.md` files**: Parses YAML frontmatter and displays **title**, **date**, and **tags** as colored badges inline. If there's no frontmatter, it falls back to the first `# H1` heading, then to the first meaningful body line.
-- **`.txt` files**: Shows the **first line** as a dimmed preview, so you instantly know what the file is about.
+<p align="center">
+  <img src="images/lsmd.png" alt="lsmd default listing" width="100%" />
+</p>
 
-```
-% lsmd
-  api-design.md         RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  cli-ux-tips.md        CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  debugging-check….txt  Step-by-step debugging checklist for production incidents
-  git-workflow.md       Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  project-kickoff.md    Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  quick-reference.txt   Common terminal shortcuts and commands for daily developmen…
-  rust-error-handl….md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-```
+> **`.md` files** → $\color{green}{\textsf{title}}$ · $\color{gray}{\textsf{date}}$ · `colored tag badges`
+>
+> **`.txt` files** → $\color{gray}{\textsf{first line preview (dimmed, 60 char max)}}$
+>
+> **Directories** → $\color{dodgerblue}{\textsf{▸ bright blue bold, always first}}$
 
 Now you can see at a glance: what each document is about, when it was written, and what topics it covers — all from a single command.
 
 ### Built for PKM (Personal Knowledge Management) 🧠
 
-If you manage a personal knowledge base with tools like Obsidian, Logseq, Dendron, or plain markdown files, **lsmd** is your terminal companion. PKM workflows rely heavily on **frontmatter tags** and **titles** to organize knowledge — but `ls` ignores all of that.
-
-With lsmd:
+If you manage a personal knowledge base with tools like **Obsidian**, **Logseq**, **Dendron**, or plain markdown files, **lsmd** is your terminal companion:
 
 - 🗂️ **Navigate your vault from the terminal** — see titles, dates, and tags without launching a GUI
 - 🔍 **Find notes by tag** — pipe to `grep` to instantly locate all notes tagged `#rust` or `#meeting`
@@ -75,30 +72,28 @@ Trusted by developers and writers who manage documentation repositories, Zettelk
 
 > *Don't just list files. List meaning.*
 
-<p align="center">
-  <img src="images/lsmd.png" alt="lsmd screenshot" width="100%" />
-</p>
+---
 
 ## Features ✨
 
-- 📋 **YAML frontmatter parsing** — show title, date, and tags inline
-- 🏷️ **Tag color badges** — hash-based consistent coloring per tag
-- 📝 **H1 heading fallback** — when no frontmatter, show the first heading
-- 📄 **`.txt` first-line preview** — dimmed, truncated at 60 chars
-- 🎨 **Nerd Font icons** — 60+ file-type icons with extension-based coloring
-- 📐 **Column-aligned output** — 22-char name column; long names truncated with `…` preserving extension
-- 📊 **Header & footer** — directory path with summary counts and total size
-- 🔒 **Permission display** — colored rwx permissions in long format
-- 🌈 **Size coloring** — green (B), yellow (KB), red (MB+) in long format
-- 📁 **Directory-first sorting** — always listed first, bright blue bold
-- 👁️ **Hidden file support** — `-a` flag to show dotfiles
-- 📑 **Long format** — `-l` with permissions, size, date, metadata
-- 🔤 **Title-only mode** — `-t` to show just the first `#` heading
-- 📂 **Markdown-only filter** — `-m` to show only `.md` and `.txt` files
-- ↕️ **Sorting options** — by name, size, modified time, or type
-- 🔄 **Reverse sort** — `-r` flag
-- 🖥️ **Auto color detection** — disables ANSI in non-TTY (pipe-safe)
-- ⚡ Fast startup — written in Rust, optimized with LTO
+| Category | Feature |
+|----------|---------|
+| 📋 **Content** | YAML frontmatter parsing (title · date · tags) |
+| 🏷️ **Tags** | Hash-based colored tag badges (same tag = same color) |
+| 📝 **Fallback** | H1 heading → first body line → nothing (graceful) |
+| 📄 **Text** | `.txt` first-line preview (sanitized, 60 char truncation) |
+| 🎨 **Colors** | ANSI-256 TrueColor palette (DodgerBlue dirs, green .md, warm white .txt) |
+| 📐 **Alignment** | 22-char name column with `…` truncation preserving extension |
+| 📊 **Header** | Directory path + summary counts (dirs, files, md, txt) |
+| 🔒 **Permissions** | Colored `rwx` display: $\color{green}{\textsf{r}}$$\color{goldenrod}{\textsf{w}}$$\color{darkred}{\textsf{x}}$ |
+| 🌈 **Size** | $\color{wheat}{\textsf{< 1 MB}}$ · $\color{lightsalmon}{\textsf{< 1 GB}}$ · $\color{orange}{\textsf{≥ 1 GB}}$ |
+| 📅 **Date** | $\color{green}{\textsf{< 1 hr}}$ · $\color{springgreen}{\textsf{< 1 day}}$ · $\color{darkcyan}{\textsf{older}}$ |
+| 📁 **Sorting** | Directories first; by name, size, modified, type |
+| 🔤 **Title mode** | `-t` shows only first `#` heading |
+| 📂 **Filter** | `-m` for .md/.txt only, `-a` for hidden files |
+| ⚡ **Performance** | Rust + LTO, single binary, zero dependencies |
+
+---
 
 ## Installation 📦
 
@@ -124,569 +119,386 @@ Or use the interactive build script (runs tests before release):
 ./build.sh
 ```
 
-The build script provides a menu with options for debug/release builds, local install, tests, clippy, packaging, and Homebrew deployment.
-
 ## Update
 
-### Homebrew
-
-```bash
-brew upgrade lsmd
-```
-
-### From Source
-
-```bash
-git pull origin main
-cargo build --release
-cp target/release/lsmd /usr/local/bin/
-```
+| Method | Command |
+|--------|---------|
+| Homebrew | `brew upgrade lsmd` |
+| Source | `git pull && cargo build --release && cp target/release/lsmd /usr/local/bin/` |
 
 ## Uninstall
 
-### Homebrew
+| Method | Command |
+|--------|---------|
+| Homebrew | `brew uninstall lsmd && brew untap leaf-kit/lsmd` |
+| Manual | `rm /usr/local/bin/lsmd` |
 
-```bash
-brew uninstall lsmd
-brew untap leaf-kit/lsmd
-```
-
-### Manual (source install)
-
-```bash
-rm /usr/local/bin/lsmd
-```
-
-## Playground 🎮
-
-The repository includes a `playground/` directory with sample files for testing every feature. It contains mixed file types, edge cases, and a curated `best-practices/` subdirectory showcasing rich frontmatter with tags.
-
-```bash
-git clone https://github.com/leaf-kit/ls.md.git
-cd ls.md
-cargo build --release
-./target/release/lsmd playground
-./target/release/lsmd playground/best-practices
-```
-
-### Playground Structure
-
-```
-playground/
-├── best-practices/          # Curated examples with rich frontmatter & tags
-│   ├── api-design.md        # tags: api, rest, design
-│   ├── cli-ux-tips.md       # tags: cli, ux, design
-│   ├── git-workflow.md      # tags: git, workflow, collaboration
-│   ├── markdown-style.md    # tags: markdown, writing, documentation
-│   ├── project-kickoff.md   # tags: project, checklist, onboarding
-│   ├── rust-error-handling.md # tags: rust, error-handling, patterns
-│   ├── debugging-checklist.txt
-│   └── quick-reference.txt
-├── docs/
-│   └── guide.md
-├── blog-post.md             # Frontmatter with title + date + tags
-├── meeting-notes.md          # Frontmatter with title + date + tags
-├── no-frontmatter.md         # H1 heading only (fallback test)
-├── broken-yaml.md            # Broken YAML (silent error test)
-├── empty.md                  # Empty file (edge case)
-├── notes.txt                 # .txt first-line preview
-├── long-line.txt             # .txt truncation test (>60 chars)
-├── empty.txt                 # Empty .txt (edge case)
-├── app.py                    # Non-markdown file
-├── config.yaml               # Non-markdown file
-└── sample.json               # Non-markdown file
-```
-
-## Usage 🚀
-
-```
-% lsmd
-lsmd — the markdown directory utility
-
-List directory contents with inline metadata for .md and .txt files.
-Like ls, but understands Markdown frontmatter, headings, and text previews.
-
-Get started with `lsmd` to see the current directory,
-or `lsmd -l` for detailed output with metadata summaries.
-
-Usage: lsmd [OPTIONS] [PATH]
-
-Arguments:
-  [PATH]
-          Directory to list (default: current directory)
-
-          [default: .]
-
-Options:
-  -a, --all
-          Show hidden files (dotfiles)
-
-  -l, --long
-          Long listing format with metadata details
-
-      --no-color
-          Disable colored output
-
-  -s, --sort <SORT_BY>
-          Sort by: name (default), size, modified, type
-
-          [default: name]
-
-  -r, --reverse
-          Reverse sort order
-
-  -m, --md-only
-          Show only .md and .txt files
-
-  -h, --help
-          Print help (see a summary with '-h')
-
-  -V, --version
-          Print version
-
-Discussion:
-    lsmd is your markdown companion for navigating directories
-    with rich document context. It parses YAML frontmatter,
-    extracts headings, previews text files, and displays
-    colored tag badges — all inline with the listing.
-
-    Get started with `lsmd` to see the current directory,
-    or `lsmd -l` for detailed metadata view.
-```
+---
 
 ## Commands & Output Examples 📸
 
-All examples below are actual outputs from running `lsmd` against the included `playground/` directory.
+All examples are actual outputs from the included `playground/` directory.
 
-### 1. Default Listing
+### 1. Default Listing — `lsmd`
+
+<p align="center">
+  <img src="images/lsmd.png" alt="lsmd default listing" width="100%" />
+</p>
+
+<details>
+<summary>📋 Text output (click to expand)</summary>
 
 ```
 % lsmd playground
-  /path/to/playground  (2 dirs, 13 files, 7 md, 3 txt)
+ /path/to/playground  (2 dirs, 13 files, 7 md, 3 txt)
 
-   best-practices/
-   docs/
-   app.py
-   blog-post.md            Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-   broken-yaml.md          Broken YAML Frontmatter Test
-   config.yaml
-   empty.md
-   empty.txt
-   long-line.txt           This is a very long first line that should be truncated wit…
-   meeting-notes.md        Team Meeting Notes · 2026-04-01 ·  meeting   planning
-   no-frontmatter.md       Simple Document
-   notes.txt               Quick notes from today's brainstorming session about the ne…
-   sample.json
-   short.md                Short
-   very-long-filename….md  Long Name Test · 2026-04-05 ·  test
+ ▸ best-practices
+ ▸ docs
+ ◦ app.py
+ ◆ blog-post.md            Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
+ ◆ broken-yaml.md          Broken YAML Frontmatter Test
+ ◦ config.yaml
+ ◆ empty.md
+ ○ empty.txt
+ ○ long-line.txt           This is a very long first line that should be truncated wit…
+ ◆ meeting-notes.md        Team Meeting Notes · 2026-04-01 ·  meeting   planning
+ ◆ no-frontmatter.md       Simple Document
+ ○ notes.txt               Quick notes from today's brainstorming session about the ne…
+ ◦ sample.json
+ ◆ short.md                Short
+ ◆ very-long-filename….md  Long Name Test · 2026-04-05 ·  test
 
-  Total: 15 items, 2.4 KB
+ Total: 15 items, 2.4 KB
 ```
 
-Key behaviors:
-- **Header** shows directory path with summary counts (dirs, files, md, txt)
-- **Nerd Font icons** per file type — colored by extension (requires [Nerd Fonts](https://www.nerdfonts.com/))
-- **Directories** listed first with folder icon in yellow
-- **`.md` files** in green with markdown icon and frontmatter summary
-- **`.md` without frontmatter** shows H1 heading or first body line as fallback
-- **`.md` with broken YAML** falls back to body text
-- **`.txt` files** in white with dimmed first-line preview (sanitized, 60 char truncation)
-- **Other files** with extension-specific icon and color
-- **Footer** shows total items and combined size
-- **22-char name column** — long names truncated with `…`, preserving extension
+</details>
 
-### 2. Long Format (`-l`)
+> **Legend:** `▸` directory · `◆` markdown · `○` text · `◦` other
+
+### 2. Long Format — `lsmd -l`
 
 <p align="center">
-  <img src="images/lsmd-l.png" alt="lsmd -l screenshot" width="100%" />
+  <img src="images/lsmd-l.png" alt="lsmd -l long format" width="100%" />
 </p>
+
+<details>
+<summary>📋 Text output (click to expand)</summary>
 
 ```
 % lsmd playground -l
-📂 320 B  2026-04-05 02:09  best-practices/
-📂  96 B  2026-04-05 01:22  docs/
-  152 B  2026-04-05 01:21  app.py
-  487 B  2026-04-05 01:21  blog-post.md  Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-  191 B  2026-04-05 01:22  broken-yaml.md
-   56 B  2026-04-05 01:22  config.yaml
-    0 B  2026-04-05 01:21  empty.md
-    0 B  2026-04-05 01:21  empty.txt
-  180 B  2026-04-05 01:21  long-line.txt  This is a very long first line that should be truncated wit…
-  395 B  2026-04-05 01:21  meeting-notes.md  Team Meeting Notes · 2026-04-01 ·  meeting   planning
-  187 B  2026-04-05 01:21  no-frontmatter.md  Simple Document
-  190 B  2026-04-05 01:21  notes.txt  Quick notes from today's brainstorming session about the ne…
-   43 B  2026-04-05 01:21  sample.json
+ /path/to/playground  (2 dirs, 13 files, 7 md, 3 txt)
+
+ drwxr-xr-x  ▸ 320 B 2026-04-05 02:09  best-practices
+ drwxr-xr-x  ▸  96 B 2026-04-05 01:22  docs
+ .rw-r--r--  ◦ 152 B 2026-04-05 01:21  app.py
+ .rw-r--r--  ◆ 487 B 2026-04-05 01:21  blog-post.md            Getting Started with Rust · 2026-03-15
+ .rw-r--r--  ◆ 191 B 2026-04-05 01:22  broken-yaml.md          Broken YAML Frontmatter Test
+ .rw-r--r--  ◦  56 B 2026-04-05 01:22  config.yaml
+ .rw-r--r--  ◆   -  2026-04-05 01:21  empty.md
+ .rw-r--r--  ○   -  2026-04-05 01:21  empty.txt
+ .rw-r--r--  ○ 180 B 2026-04-05 01:21  long-line.txt           This is a very long first line…
+ .rw-r--r--  ◆ 395 B 2026-04-05 01:21  meeting-notes.md        Team Meeting Notes · 2026-04-01
+ .rw-r--r--  ◆ 187 B 2026-04-05 01:21  no-frontmatter.md       Simple Document
+ .rw-r--r--  ○ 190 B 2026-04-05 01:21  notes.txt               Quick notes from today's brainstorming…
+ .rw-r--r--  ◦  43 B 2026-04-05 01:21  sample.json
+
+ Total: 15 items, 2.4 KB
 ```
 
-Shows file size and modification time alongside metadata.
+</details>
 
-### 3. Show Hidden Files (`-a`)
+> Shows **permissions** · **icon** · **size** (color by magnitude) · **date** (color by recency) · **name** · **metadata**
+
+### 3. Show Hidden Files — `lsmd -a`
+
+<p align="center">
+  <img src="images/lsmd-a.png" alt="lsmd -a hidden files" width="100%" />
+</p>
+
+<details>
+<summary>📋 Text output (click to expand)</summary>
 
 ```
 % lsmd playground -a
-📂 .hidden-dir/
-📂 best-practices/
-📂 docs/
-  .hidden-file.md  Hidden Markdown File
-  app.py
-  blog-post.md  Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-  broken-yaml.md
-  ...
+ /path/to/playground  (3 dirs, 14 files, 8 md, 3 txt)
+
+ ▸ .hidden-dir
+ ▸ best-practices
+ ▸ docs
+ ◆ .hidden-file.md         Hidden Markdown File
+ ◦ app.py
+ ◆ blog-post.md            Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
+ ◆ broken-yaml.md          Broken YAML Frontmatter Test
+ ...
+
+ Total: 17 items, 2.5 KB
 ```
 
-Reveals dotfiles and hidden directories.
+</details>
 
-### 4. Markdown Only (`-m`)
+### 4. Markdown Only — `lsmd -m`
+
+<p align="center">
+  <img src="images/lsmd-m.png" alt="lsmd -m markdown only" width="100%" />
+</p>
+
+<details>
+<summary>📋 Text output (click to expand)</summary>
 
 ```
 % lsmd playground -m
-📂 best-practices/
-📂 docs/
-  blog-post.md  Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-  broken-yaml.md
-  empty.md
-  empty.txt
-  long-line.txt  This is a very long first line that should be truncated wit…
-  meeting-notes.md  Team Meeting Notes · 2026-04-01 ·  meeting   planning
-  no-frontmatter.md  Simple Document
-  notes.txt  Quick notes from today's brainstorming session about the ne…
+ /path/to/playground  (2 dirs, 10 files, 7 md, 3 txt)
+
+ ▸ best-practices
+ ▸ docs
+ ◆ blog-post.md            Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
+ ◆ broken-yaml.md          Broken YAML Frontmatter Test
+ ◆ empty.md
+ ○ empty.txt
+ ○ long-line.txt           This is a very long first line that should be truncated wit…
+ ◆ meeting-notes.md        Team Meeting Notes · 2026-04-01 ·  meeting   planning
+ ◆ no-frontmatter.md       Simple Document
+ ○ notes.txt               Quick notes from today's brainstorming session about the ne…
+ ◆ short.md                Short
+ ◆ very-long-filename….md  Long Name Test · 2026-04-05 ·  test
+
+ Total: 12 items, 2.2 KB
 ```
 
-Filters to show only `.md` and `.txt` files (directories are always included).
+</details>
 
-### 5. Sort Options
+> Filters to `.md` and `.txt` only. Directories are always included.
 
-**Sort by size:**
+### 5. Sort by Size — `lsmd -s size`
+
+<p align="center">
+  <img src="images/lsmd-s_size.png" alt="lsmd -s size" width="100%" />
+</p>
+
+<details>
+<summary>📋 Text output (click to expand)</summary>
+
 ```
 % lsmd playground -s size
-📂 docs/
-📂 best-practices/
-  empty.txt
-  empty.md
-  sample.json
-  config.yaml
-  app.py
-  long-line.txt  This is a very long first line that should be truncated wit…
-  no-frontmatter.md  Simple Document
-  notes.txt  Quick notes from today's brainstorming session about the ne…
-  broken-yaml.md
-  meeting-notes.md  Team Meeting Notes · 2026-04-01 ·  meeting   planning
-  blog-post.md  Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
+ /path/to/playground  (2 dirs, 13 files, 7 md, 3 txt)
+
+ ▸ docs
+ ▸ best-practices
+ ○ empty.txt
+ ◆ empty.md
+ ◆ short.md                Short
+ ◦ sample.json
+ ◦ config.yaml
+ ◆ very-long-filename….md  Long Name Test · 2026-04-05 ·  test
+ ◦ app.py
+ ○ long-line.txt           This is a very long first line that should be truncated wit…
+ ◆ no-frontmatter.md       Simple Document
+ ○ notes.txt               Quick notes from today's brainstorming session about the ne…
+ ◆ broken-yaml.md          Broken YAML Frontmatter Test
+ ◆ meeting-notes.md        Team Meeting Notes · 2026-04-01 ·  meeting   planning
+ ◆ blog-post.md            Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
+
+ Total: 15 items, 2.4 KB
 ```
 
-**Sort by name, reversed:**
-```
-% lsmd playground -s name -r
-📂 docs/
-📂 best-practices/
-  sample.json
-  notes.txt  Quick notes from today's brainstorming session about the ne…
-  no-frontmatter.md  Simple Document
-  meeting-notes.md  Team Meeting Notes · 2026-04-01 ·  meeting   planning
-  long-line.txt  This is a very long first line that should be truncated wit…
-  empty.txt
-  empty.md
-  config.yaml
-  broken-yaml.md
-  blog-post.md  Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-  app.py
-```
+</details>
 
-### 6. Best Practices — Curated Examples
+### 6. Title Only — `lsmd -t`
 
-The `playground/best-practices/` directory contains well-structured Markdown documents with rich frontmatter, demonstrating how lsmd displays titles, dates, and colored tag badges at a glance.
-
-**Default listing:**
-```
-% lsmd playground/best-practices
-  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  debugging-checklist.txt  Step-by-step debugging checklist for production incidents
-  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  markdown-style.md  Markdown Writing Style Guide · 2026-03-10 ·  markdown   writing   documentation
-  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  quick-reference.txt  Common terminal shortcuts and commands for daily developmen…
-  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-```
-
-**Long format:**
-```
-% lsmd playground/best-practices -l
-  744 B  2026-04-05 02:08  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  773 B  2026-04-05 02:09  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  403 B  2026-04-05 02:09  debugging-checklist.txt  Step-by-step debugging checklist for production incidents
-  697 B  2026-04-05 02:08  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  737 B  2026-04-05 02:09  markdown-style.md  Markdown Writing Style Guide · 2026-03-10 ·  markdown   writing   documentation
-  532 B  2026-04-05 02:08  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  381 B  2026-04-05 02:09  quick-reference.txt  Common terminal shortcuts and commands for daily developmen…
-  836 B  2026-04-05 02:08  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-```
-
-**Markdown only (`-m`):**
-```
-% lsmd playground/best-practices -m
-  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  debugging-checklist.txt  Step-by-step debugging checklist for production incidents
-  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  markdown-style.md  Markdown Writing Style Guide · 2026-03-10 ·  markdown   writing   documentation
-  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  quick-reference.txt  Common terminal shortcuts and commands for daily developmen…
-  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-```
-
-**Sort by modification date (`-s modified`):**
-```
-% lsmd playground/best-practices -s modified
-  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  markdown-style.md  Markdown Writing Style Guide · 2026-03-10 ·  markdown   writing   documentation
-  quick-reference.txt  Common terminal shortcuts and commands for daily developmen…
-  debugging-checklist.txt  Step-by-step debugging checklist for production incidents
-```
-
-### 7. Title Only (`-t`)
-
-Show only the first `#` heading from `.md` files, without frontmatter details (date, tags). Useful for a quick overview of document titles in a large collection.
+Show only the first `#` heading from `.md` files, without frontmatter details:
 
 ```
 % lsmd playground/best-practices -t
-  api-design.md           RESTful API Design Principles
-  cli-ux-tips.md          CLI UX Design Tips
-  debugging-checkli….txt  Step-by-step debugging checklist for production incidents
-  git-workflow.md         Git Workflow Guide
-  markdown-style.md       Markdown Writing Style Guide
-  project-kickoff.md      Project Kickoff Checklist
-  quick-reference.txt     Common terminal shortcuts and commands for daily developmen…
-  rust-error-handling.md  Rust Error Handling Patterns
+ /path/to/playground/best-practices  (8 files, 6 md, 2 txt)
+
+ ◆ api-design.md           RESTful API Design Principles
+ ◆ cli-ux-tips.md          CLI UX Design Tips
+ ○ debugging-checkli….txt  Step-by-step debugging checklist for production incidents
+ ◆ git-workflow.md         Git Workflow Guide
+ ◆ markdown-style.md       Markdown Writing Style Guide
+ ◆ project-kickoff.md      Project Kickoff Checklist
+ ○ quick-reference.txt     Common terminal shortcuts and commands for daily developmen…
+ ◆ rust-error-handling.md  Rust Error Handling Patterns
+
+ Total: 8 items, 5.0 KB
 ```
 
-Combined with long format:
+> Clean title scan — perfect for large vaults. Combine with `-l` for sizes and dates.
+
+### 7. Best Practices — Curated Examples
 
 ```
-% lsmd playground/best-practices -t -l
- .rw-r--r--   744 B 2026-04-05 02:08  api-design.md           RESTful API Design Principles
- .rw-r--r--   773 B 2026-04-05 02:09  cli-ux-tips.md          CLI UX Design Tips
- .rw-r--r--   403 B 2026-04-05 02:09  debugging-checkli….txt  Step-by-step debugging checklist for production incidents
- .rw-r--r--   697 B 2026-04-05 02:08  git-workflow.md         Git Workflow Guide
- .rw-r--r--   737 B 2026-04-05 02:09  markdown-style.md       Markdown Writing Style Guide
- .rw-r--r--   532 B 2026-04-05 02:08  project-kickoff.md      Project Kickoff Checklist
- .rw-r--r--   381 B 2026-04-05 02:09  quick-reference.txt     Common terminal shortcuts and commands for daily developmen…
- .rw-r--r--   836 B 2026-04-05 02:08  rust-error-handling.md  Rust Error Handling Patterns
+% lsmd playground/best-practices
+ /path/to/playground/best-practices  (8 files, 6 md, 2 txt)
+
+ ◆ api-design.md           RESTful API Design Principles · 2026-03-15 ·  api   rest   design
+ ◆ cli-ux-tips.md          CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
+ ○ debugging-checkli….txt  Step-by-step debugging checklist for production incidents
+ ◆ git-workflow.md         Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
+ ◆ markdown-style.md       Markdown Writing Style Guide · 2026-03-10 ·  markdown   writing   documentation
+ ◆ project-kickoff.md      Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
+ ○ quick-reference.txt     Common terminal shortcuts and commands for daily developmen…
+ ◆ rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
+
+ Total: 8 items, 5.0 KB
 ```
+
+---
 
 ## Options Reference ⚙️
 
 | Option | Short | Description |
 |--------|-------|-------------|
 | `--all` | `-a` | Show hidden files (dotfiles) |
-| `--long` | `-l` | Long format with permissions, size, date, metadata |
+| `--long` | `-l` | Long format: permissions, size, date, metadata |
 | `--no-color` | | Disable ANSI color output |
 | `--sort <FIELD>` | `-s` | Sort by: `name`, `size`, `modified`, `type` |
 | `--reverse` | `-r` | Reverse sort order |
 | `--md-only` | `-m` | Show only `.md` and `.txt` files |
 | `--title` | `-t` | Show only the first `#` heading for `.md` files |
 
+---
+
+## Color Scheme 🎨
+
+lsmd uses an ANSI-256 TrueColor palette for consistent, readable output across terminals:
+
+### File Types
+
+| Element | Color | Example |
+|---------|-------|---------|
+| Directory name | $\color{dodgerblue}{\textsf{DodgerBlue bold}}$ | `▸ best-practices` |
+| `.md` file name | $\color{green}{\textsf{Light Green}}$ | `◆ blog-post.md` |
+| `.txt` file name | $\color{wheat}{\textsf{Warm White}}$ | `○ notes.txt` |
+| Other file name | $\color{goldenrod}{\textsf{Yellow}}$ | `◦ app.py` |
+| Hidden file | $\color{gray}{\textsf{Grey}}$ | `◆ .hidden-file.md` |
+| Executable | $\color{limegreen}{\textsf{Green bold}}$ | `◦ script.sh` |
+
+### Long Format Columns
+
+| Column | Coloring |
+|--------|----------|
+| Permission `r` | $\color{green}{\textsf{green}}$ |
+| Permission `w` | $\color{goldenrod}{\textsf{yellow}}$ |
+| Permission `x` | $\color{darkred}{\textsf{red}}$ |
+| Permission `-` / `.` | $\color{gray}{\textsf{grey}}$ |
+| Size < 1 MB | $\color{wheat}{\textsf{Wheat}}$ |
+| Size < 1 GB | $\color{lightsalmon}{\textsf{LightSalmon}}$ |
+| Size ≥ 1 GB | $\color{orange}{\textsf{Orange}}$ |
+| Date < 1 hour | $\color{limegreen}{\textsf{Green}}$ |
+| Date < 1 day | $\color{springgreen}{\textsf{SpringGreen}}$ |
+| Date older | $\color{darkcyan}{\textsf{DarkCyan}}$ |
+
+---
+
 ## Content Preview Policy 📖
 
-lsmd extracts a one-line summary from `.md` and `.txt` files. The preview text is **sanitized** — special characters (`*`, `[`, `]`, `` ` ``, `#`, `|`, `{`, `}`, `<`, `>`, etc.) are stripped, keeping only readable text: alphanumeric characters, Korean, Chinese, Japanese, and basic punctuation (`.` `,` `!` `?` `:` `-`). This ensures clean, scannable output.
+lsmd extracts a one-line summary from `.md` and `.txt` files. Preview text is **sanitized** — special characters are stripped, keeping only readable text (alphanumeric, Korean, CJK, basic punctuation).
 
-### `.md` file preview priority
+### `.md` preview priority
 
-1. **YAML frontmatter** — if `title`, `date`, `tags` fields exist, display them inline with colored tag badges
-2. **`# H1` heading** — if no frontmatter, show the first H1 heading text
-3. **First content line** — if no frontmatter and no H1, show the first meaningful body text (skipping blank lines, code fences, horizontal rules)
-4. **Broken YAML** — if frontmatter exists but fails to parse, fall through to H1 or content fallback (no crash)
-5. **Empty file** — file name only
+| Priority | Source | Displayed as |
+|----------|--------|-------------|
+| 1 | YAML frontmatter | `title` · `date` · colored tag badges |
+| 2 | First `# H1` heading | dimmed heading text |
+| 3 | First body line | dimmed content (skipping code fences, `---`) |
+| 4 | Broken YAML | falls back to #2 or #3 |
+| 5 | Empty file | file name only |
 
-### `.txt` file preview
+### `.txt` preview
 
-1. **First meaningful line** — the first non-blank line after sanitization, truncated at 60 characters with ellipsis
-2. **Empty file** — file name only
+| Priority | Source | Displayed as |
+|----------|--------|-------------|
+| 1 | First meaningful line | dimmed, sanitized, max 60 chars + `…` |
+| 2 | Empty file | file name only |
 
-## File Type Handling
-
-| File Type | Behavior |
-|-----------|----------|
-| `.md` with frontmatter | title · date · colored tag badges |
-| `.md` with H1 only | dimmed heading text (sanitized) |
-| `.md` with body text only | dimmed first content line (sanitized) |
-| `.md` broken YAML | falls back to H1 or body text |
-| `.md` empty | file name only |
-| `.txt` | dimmed first meaningful line (sanitized, max 60 chars) |
-| `.txt` empty | file name only |
-| Other files | extension-colored Nerd Font icon, normal name |
-| Directories | yellow folder icon, bright blue bold name, always listed first |
+---
 
 ## Pipe Integration (`|`) 🔧
 
-lsmd auto-disables ANSI colors when output is piped, making it safe for use with `grep`, `awk`, `wc`, `sort`, `sed`, `xargs`, and other Unix tools. All examples below were tested against `playground/best-practices/`.
+lsmd auto-disables ANSI colors when output is piped, making it safe for `grep`, `awk`, `wc`, `sort`, `sed`, `xargs`.
 
 ### Useful Pipe Recipes
 
-**Find files by tag** — search for a specific tag across the listing:
+```bash
+# Find files by tag
+lsmd playground/best-practices | grep "rust"
 
-```
-% lsmd playground/best-practices | grep "rust"
-  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-```
+# Find all documents tagged "design"
+lsmd playground/best-practices | grep "design"
 
-**Find files sharing a tag** — find all documents tagged with "design":
+# Count markdown files
+lsmd playground/best-practices | grep "\.md" | wc -l
 
-```
-% lsmd playground/best-practices | grep "design"
-  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-```
+# Extract file names only
+lsmd playground/best-practices | awk '{print $1}'
 
-**Case-insensitive multi-pattern search** — find API or REST related files:
+# Extract document titles
+lsmd playground/best-practices | grep "·" | cut -d'·' -f1 | sed 's/^[[:space:]]*[^ ]* *//'
 
-```
-% lsmd playground/best-practices | grep -iE "api|rest"
-  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-```
+# Tag frequency analysis
+lsmd playground/best-practices | grep "·" | sed 's/.*·//' | grep -oE '[a-z][-a-z]*' | sort | uniq -c | sort -rn
 
-**Count markdown files** — quick total with `wc -l`:
-
-```
-% lsmd playground/best-practices | grep "\.md" | wc -l
-6
+# Line count per file
+lsmd playground/best-practices | awk '{print $1}' | sed 's|^|playground/best-practices/|' | xargs wc -l
 ```
 
-**Count files with frontmatter** — files that have title/date/tags:
+> **Notes:** Colors auto-disable in pipes. File names are the first field. Frontmatter fields are separated by `·`. Output is UTF-8.
+
+---
+
+## Playground 🎮
+
+The repository includes a `playground/` directory with sample files for testing every feature:
 
 ```
-% lsmd playground/best-practices | grep -c "·"
-6
+playground/
+├── best-practices/          # Curated .md with rich frontmatter & tags
+│   ├── api-design.md        # tags: api, rest, design
+│   ├── cli-ux-tips.md       # tags: cli, ux, design
+│   ├── git-workflow.md      # tags: git, workflow, collaboration
+│   ├── markdown-style.md    # tags: markdown, writing, documentation
+│   ├── project-kickoff.md   # tags: project, checklist, onboarding
+│   ├── rust-error-handling.md
+│   ├── debugging-checklist.txt
+│   └── quick-reference.txt
+├── docs/guide.md
+├── blog-post.md             # frontmatter: title + date + tags
+├── meeting-notes.md         # frontmatter: title + date + tags
+├── no-frontmatter.md        # H1 heading only (fallback test)
+├── broken-yaml.md           # broken YAML (error handling test)
+├── empty.md / empty.txt     # edge case: empty files
+├── notes.txt / long-line.txt
+├── app.py / config.yaml / sample.json
+└── short.md / very-long-filename-example.md
 ```
 
-**Extract file names only** — clean list for scripting:
-
-```
-% lsmd playground/best-practices | awk '{print $1}'
-api-design.md
-cli-ux-tips.md
-debugging-checklist.txt
-git-workflow.md
-markdown-style.md
-project-kickoff.md
-quick-reference.txt
-rust-error-handling.md
-```
-
-**Extract document titles** — parse titles from frontmatter output:
-
-```
-% lsmd playground/best-practices | grep "·" | cut -d'·' -f1 | sed 's/^[[:space:]]*[^ ]* *//'
-RESTful API Design Principles
-CLI UX Design Tips
-Git Workflow Guide
-Markdown Writing Style Guide
-Project Kickoff Checklist
-Rust Error Handling Patterns
-```
-
-**Tag frequency analysis** — find the most-used tags across all documents:
-
-```
-% lsmd playground/best-practices | grep "·" | sed 's/.*·//' | grep -oE '[a-z][-a-z]*' | sort | uniq -c | sort -rn
-   2 design
-   1 writing
-   1 workflow
-   1 ux
-   1 rust
-   1 rest
-   1 project
-   1 patterns
-   1 onboarding
-   1 markdown
-   1 git
-   1 error-handling
-   1 documentation
-   1 collaboration
-   1 cli
-   1 checklist
-   1 api
-```
-
-**Exclude txt files** — show only markdown results:
-
-```
-% lsmd playground/best-practices | grep -v "\.txt"
-  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  markdown-style.md  Markdown Writing Style Guide · 2026-03-10 ·  markdown   writing   documentation
-  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-```
-
-**Sort long output by file size** — combine `-l` with `sort`:
-
-```
-% lsmd playground/best-practices -l | sort -n -k1
-  381 B  2026-04-05 02:09  quick-reference.txt  Common terminal shortcuts and commands for daily developmen…
-  403 B  2026-04-05 02:09  debugging-checklist.txt  Step-by-step debugging checklist for production incidents
-  532 B  2026-04-05 02:08  project-kickoff.md  Project Kickoff Checklist · 2026-04-01 ·  project   checklist   onboarding
-  697 B  2026-04-05 02:08  git-workflow.md  Git Workflow Guide · 2026-03-20 ·  git   workflow   collaboration
-  737 B  2026-04-05 02:09  markdown-style.md  Markdown Writing Style Guide · 2026-03-10 ·  markdown   writing   documentation
-  744 B  2026-04-05 02:08  api-design.md  RESTful API Design Principles · 2026-03-15 ·  api   rest   design
-  773 B  2026-04-05 02:09  cli-ux-tips.md  CLI UX Design Tips · 2026-04-03 ·  cli   ux   design
-  836 B  2026-04-05 02:08  rust-error-handling.md  Rust Error Handling Patterns · 2026-03-28 ·  rust   error-handling   patterns
-```
-
-**Line count per file** — combine with `xargs wc`:
-
-```
-% lsmd playground/best-practices | awk '{print $1}' | sed 's|^|playground/best-practices/|' | xargs wc -l
-      48 playground/best-practices/api-design.md
-      31 playground/best-practices/cli-ux-tips.md
-       9 playground/best-practices/debugging-checklist.txt
-      36 playground/best-practices/git-workflow.md
-      41 playground/best-practices/markdown-style.md
-      30 playground/best-practices/project-kickoff.md
-      11 playground/best-practices/quick-reference.txt
-      42 playground/best-practices/rust-error-handling.md
-     248 total
-```
-
-### Pipe Usage Notes
-
-> **Important caveats when using lsmd with pipes:**
-
-1. **Colored output is auto-disabled in pipes.** The `colored` library auto-detects non-TTY output and disables ANSI codes, so pipe output is clean plain text.
-
-2. **Use `--no-color` for explicit control.** When scripting, add `--no-color` to guarantee plain text regardless of environment.
-
-3. **File names are the first field.** Use `awk '{print $1}'` to extract file names from default output.
-
-4. **Frontmatter fields are separated by `·`.** Use `cut -d'·'` to split title, date, and tag sections.
-
-5. **Encoding: lsmd outputs UTF-8.** If piping to tools that expect ASCII, use `LC_ALL=en_US.UTF-8` if needed.
+---
 
 ## Edge Cases 🛡️
 
-lsmd handles these scenarios gracefully:
+| Scenario | Behavior |
+|----------|----------|
+| Empty file | Name only, no crash |
+| Broken YAML frontmatter | Falls back to H1 or body text |
+| Very long file names | Truncated with `…`, extension preserved |
+| Non-existent path | Clear error message |
+| Permission errors | Skipped silently |
+| Non-directory path | Clear error message |
 
-- **Empty files** — displayed with name only, no crash
-- **Broken YAML frontmatter** — silently ignored
-- **Very long file names** — terminal wrapping handles overflow
-- **Non-existent paths** — clear error message
-- **Permission errors** — skipped silently
-- **Non-directory paths** — clear error message
+---
 
 ## Related Projects 🔗
 
-lsmd complements existing terminal tools in the Markdown ecosystem:
+| Project | Description | Difference |
+|---------|-------------|------------|
+| [**gmd**](https://github.com/leaf-kit/g.md) | Grep Markdown — structure-aware search | Search vs listing |
+| [**lsd**](https://github.com/lsd-rs/lsd) | LSDeluxe — modern `ls` with icons | File-type aware, not content-aware |
+| [**eza**](https://github.com/eza-community/eza) | Modern `ls` replacement | Metadata-focused, not Markdown-aware |
 
-- [**gmd**](https://github.com/leaf-kit/g.md) — Grep Markdown. Structure-aware search across Markdown documents.
-- [**lsd**](https://github.com/lsd-rs/lsd) — LSDeluxe. A modern `ls` with icons and colors (file-type aware, not content-aware).
-- [**exa/eza**](https://github.com/eza-community/eza) — A modern replacement for `ls` (metadata-focused, not Markdown-aware).
+> lsmd is the only `ls`-style tool that **reads inside** `.md` and `.txt` files to surface structured metadata inline.
 
-lsmd fills the gap: it is the only `ls`-style tool that **reads inside** `.md` and `.txt` files to surface structured metadata inline.
+---
 
 ## Feedback & Contributing 💬
 

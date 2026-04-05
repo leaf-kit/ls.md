@@ -39,6 +39,7 @@ pub fn parse_md(path: &Path) -> MdMeta {
     let mut meta = MdMeta::default();
 
     // Try parsing YAML frontmatter
+    let content_start;
     if !lines.is_empty() && lines[0].trim() == "---" {
         if let Some(end) = lines[1..].iter().position(|l| l.trim() == "---") {
             let yaml_str = lines[1..=end].join("\n");
@@ -59,17 +60,47 @@ pub fn parse_md(path: &Path) -> MdMeta {
                         }
                     }
                 }
+                return meta;
             }
-            return meta;
+            // YAML parse failed — fall through to content-based fallback
+            content_start = end + 2; // skip past closing ---
+        } else {
+            content_start = 0;
+        }
+    } else {
+        content_start = 0;
+    }
+
+    let search_lines = &lines[content_start..];
+
+    // Fallback 1: find first H1 heading
+    for line in search_lines {
+        let trimmed = line.trim();
+        if let Some(heading) = trimmed.strip_prefix("# ") {
+            let cleaned = sanitize_preview(heading);
+            if !cleaned.is_empty() {
+                meta.h1 = Some(cleaned);
+                return meta;
+            }
         }
     }
 
-    // Fallback: find first H1 heading
-    for line in &lines {
+    // Fallback 2: find first meaningful content line
+    for line in search_lines {
         let trimmed = line.trim();
-        if let Some(heading) = trimmed.strip_prefix("# ") {
-            meta.h1 = Some(heading.to_string());
-            break;
+        // Skip markdown syntax lines
+        if trimmed.is_empty()
+            || trimmed.starts_with('#')
+            || trimmed.starts_with("```")
+            || trimmed.starts_with("---")
+            || trimmed.starts_with("|||")
+        {
+            continue;
+        }
+        let cleaned = sanitize_preview(trimmed);
+        if !cleaned.is_empty() {
+            meta.h1 = Some(cleaned);
+            return meta;
         }
     }
 
@@ -99,7 +130,7 @@ pub fn format_md_summary(meta: &MdMeta) -> String {
 
     if parts.is_empty() {
         if let Some(ref h1) = meta.h1 {
-            return h1.dimmed().to_string();
+            return truncate_str(h1, 60).dimmed().to_string();
         }
     }
 
@@ -145,20 +176,52 @@ fn format_tag_badge(tag: &str) -> String {
     }
 }
 
-/// Read first non-empty line of a .txt file, truncated to 60 chars.
+/// Strip special characters, keeping only alphanumeric, Korean, Japanese,
+/// Chinese characters, spaces, and basic punctuation (.,!?;:-).
+/// Returns an empty string if nothing meaningful remains.
+fn sanitize_preview(s: &str) -> String {
+    let cleaned: String = s
+        .chars()
+        .filter(|c| {
+            c.is_alphanumeric()
+                || c.is_whitespace()
+                || matches!(c, '.' | ',' | '!' | '?' | ';' | ':' | '-' | '\'' | '"' | '(' | ')')
+                // Korean (Hangul)
+                || ('\u{AC00}'..='\u{D7AF}').contains(c)  // Syllables
+                || ('\u{1100}'..='\u{11FF}').contains(c)  // Jamo
+                || ('\u{3130}'..='\u{318F}').contains(c)  // Compat Jamo
+                // CJK Unified Ideographs
+                || ('\u{4E00}'..='\u{9FFF}').contains(c)
+                // Hiragana & Katakana
+                || ('\u{3040}'..='\u{30FF}').contains(c)
+        })
+        .collect();
+
+    // Collapse multiple spaces
+    let result: String = cleaned.split_whitespace().collect::<Vec<&str>>().join(" ");
+    result
+}
+
+/// Truncate a string to max chars, respecting UTF-8 char boundaries.
+fn truncate_str(s: &str, max: usize) -> String {
+    if s.chars().count() <= max {
+        s.to_string()
+    } else {
+        let truncated: String = s.chars().take(max - 1).collect();
+        format!("{}…", truncated)
+    }
+}
+
+/// Read first meaningful line of a .txt file, sanitized and truncated to 60 chars.
 pub fn read_txt_preview(path: &Path) -> Option<String> {
     let file = File::open(path).ok()?;
     let reader = BufReader::new(file);
 
     for line in reader.lines().take(MAX_LINES) {
         if let Ok(l) = line {
-            let trimmed = l.trim().to_string();
-            if !trimmed.is_empty() {
-                let preview = if trimmed.len() > 60 {
-                    format!("{}…", &trimmed[..59])
-                } else {
-                    trimmed
-                };
+            let cleaned = sanitize_preview(l.trim());
+            if !cleaned.is_empty() {
+                let preview = truncate_str(&cleaned, 60);
                 return Some(preview.dimmed().to_string());
             }
         }
@@ -244,6 +307,39 @@ mod tests {
 
         let preview = read_txt_preview(&file_path);
         assert!(preview.is_none());
+    }
+
+    #[test]
+    fn test_sanitize_preview() {
+        assert_eq!(sanitize_preview("Hello World"), "Hello World");
+        assert_eq!(sanitize_preview("## **bold** text"), "bold text");
+        assert_eq!(sanitize_preview("---"), "---");
+        assert_eq!(sanitize_preview("```rust"), "rust");
+        assert_eq!(sanitize_preview(""), "");
+        assert_eq!(sanitize_preview("***"), "");
+        assert_eq!(sanitize_preview("한글 테스트"), "한글 테스트");
+        assert_eq!(sanitize_preview("[link](http://example.com)"), "link(http:example.com)");
+    }
+
+    #[test]
+    fn test_truncate_str() {
+        assert_eq!(truncate_str("short", 60), "short");
+        let long = "A".repeat(100);
+        let result = truncate_str(&long, 60);
+        assert!(result.ends_with('…'));
+        assert_eq!(result.chars().count(), 60);
+    }
+
+    #[test]
+    fn test_parse_md_content_fallback() {
+        let dir = tempfile::tempdir().unwrap();
+        let file_path = dir.path().join("no-heading.md");
+        let mut f = File::create(&file_path).unwrap();
+        write!(f, "This is plain content without any heading").unwrap();
+
+        let meta = parse_md(&file_path);
+        assert!(meta.h1.is_some());
+        assert!(meta.h1.unwrap().contains("This is plain content"));
     }
 
     #[test]

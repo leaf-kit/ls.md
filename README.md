@@ -257,7 +257,7 @@ All examples below are actual outputs from running `lsmd` against the included `
 📂 docs/
   app.py
   blog-post.md  Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-  broken-yaml.md
+  broken-yaml.md  Broken YAML Frontmatter Test
   config.yaml
   empty.md
   empty.txt
@@ -273,9 +273,9 @@ Key behaviors:
 - **Files** listed without emoji, clean indentation
 - **`.md` with frontmatter** shows title · date · tag badges (`blog-post.md`)
 - **`.md` without frontmatter** shows H1 heading (`no-frontmatter.md`)
-- **`.md` with broken YAML** silently ignored (`broken-yaml.md`)
+- **`.md` with broken YAML** falls back to body text (`broken-yaml.md` → "Broken YAML Frontmatter Test")
 - **`.md` empty file** no extra info (`empty.md`)
-- **`.txt` files** show dimmed first-line preview, truncated at 60 chars
+- **`.txt` files** show dimmed first-line preview, sanitized and truncated at 60 chars
 - **Other files** listed plainly without icons
 
 ### 2. Long Format (`-l`)
@@ -442,17 +442,35 @@ The `playground/best-practices/` directory contains well-structured Markdown doc
 | `--reverse` | `-r` | Reverse sort order |
 | `--md-only` | `-m` | Show only `.md` and `.txt` files |
 
+## Content Preview Policy
+
+lsmd extracts a one-line summary from `.md` and `.txt` files. The preview text is **sanitized** — special characters (`*`, `[`, `]`, `` ` ``, `#`, `|`, `{`, `}`, `<`, `>`, etc.) are stripped, keeping only readable text: alphanumeric characters, Korean, Chinese, Japanese, and basic punctuation (`.` `,` `!` `?` `:` `-`). This ensures clean, scannable output.
+
+### `.md` file preview priority
+
+1. **YAML frontmatter** — if `title`, `date`, `tags` fields exist, display them inline with colored tag badges
+2. **`# H1` heading** — if no frontmatter, show the first H1 heading text
+3. **First content line** — if no frontmatter and no H1, show the first meaningful body text (skipping blank lines, code fences, horizontal rules)
+4. **Broken YAML** — if frontmatter exists but fails to parse, fall through to H1 or content fallback (no crash)
+5. **Empty file** — file name only
+
+### `.txt` file preview
+
+1. **First meaningful line** — the first non-blank line after sanitization, truncated at 60 characters with ellipsis
+2. **Empty file** — file name only
+
 ## File Type Handling
 
 | File Type | Behavior |
 |-----------|----------|
 | `.md` with frontmatter | title · date · colored tag badges |
-| `.md` with H1 only | dimmed heading text |
-| `.md` empty / no metadata | file name only |
-| `.md` broken YAML | silently ignored, no crash |
-| `.txt` | dimmed first non-empty line (max 60 chars + ellipsis) |
+| `.md` with H1 only | dimmed heading text (sanitized) |
+| `.md` with body text only | dimmed first content line (sanitized) |
+| `.md` broken YAML | falls back to H1 or body text |
+| `.md` empty | file name only |
+| `.txt` | dimmed first meaningful line (sanitized, max 60 chars) |
 | `.txt` empty | file name only |
-| Other files | file name only, no icon |
+| Other files | file name only |
 | Directories | 📂 icon, blue name, always listed first |
 
 ## Pipe Integration (`|`)

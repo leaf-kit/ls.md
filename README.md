@@ -80,8 +80,9 @@ With lsmd:
 - **Tag color badges** — hash-based consistent coloring per tag
 - **H1 heading fallback** — when no frontmatter, show the first heading
 - **`.txt` first-line preview** — dimmed, truncated at 60 chars
+- **Column-aligned output** — file names fit a fixed 20-char column; long names are truncated with `…` preserving the extension; metadata starts at the same column for every line
 - **Clean output** — 📂 icon for directories only, no emoji clutter on files
-- **Directory-first sorting** — directories always listed first, in blue
+- **Directory-first sorting** — directories always listed first, in cyan
 - **Hidden file support** — `-a` flag to show dotfiles
 - **Long format** — `-l` for size, modification time, and metadata
 - **Markdown-only filter** — `-m` to show only `.md` and `.txt` files
@@ -256,16 +257,18 @@ All examples below are actual outputs from running `lsmd` against the included `
 📂 best-practices/
 📂 docs/
   app.py
-  blog-post.md  Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
-  broken-yaml.md  Broken YAML Frontmatter Test
+  blog-post.md          Getting Started with Rust · 2026-03-15 ·  rust   programming   tutorial
+  broken-yaml.md        Broken YAML Frontmatter Test
   config.yaml
   empty.md
   empty.txt
-  long-line.txt  This is a very long first line that should be truncated wit…
-  meeting-notes.md  Team Meeting Notes · 2026-04-01 ·  meeting   planning
-  no-frontmatter.md  Simple Document
-  notes.txt  Quick notes from today's brainstorming session about the ne…
+  long-line.txt         This is a very long first line that should be truncated wit…
+  meeting-notes.md      Team Meeting Notes · 2026-04-01 ·  meeting   planning
+  no-frontmatter.md     Simple Document
+  notes.txt             Quick notes from today's brainstorming session about the ne…
   sample.json
+  short.md              Short
+  very-long-filena….md  Long Name Test · 2026-04-05 ·  test
 ```
 
 Key behaviors:
@@ -471,7 +474,7 @@ lsmd extracts a one-line summary from `.md` and `.txt` files. The preview text i
 | `.txt` | dimmed first meaningful line (sanitized, max 60 chars) |
 | `.txt` empty | file name only |
 | Other files | file name only |
-| Directories | 📂 icon, blue name, always listed first |
+| Directories | 📂 icon, cyan bold name, always listed first |
 
 ## Pipe Integration (`|`)
 

@@ -9,6 +9,68 @@ use crate::entry::{DirEntry, format_size, format_time};
 use crate::frontmatter::{format_md_summary, parse_md, read_txt_preview};
 use crate::icon::dir_icon;
 
+const NAME_COL_WIDTH: usize = 20;
+
+/// Truncate a file name to fit within NAME_COL_WIDTH, preserving extension.
+/// Returns (display_name, raw_visible_len) where display_name has ANSI codes.
+fn format_name_column(entry: &DirEntry) -> (String, usize) {
+    let raw_name = &entry.name;
+    let is_dir_entry = entry.is_dir;
+
+    let display_raw = if is_dir_entry {
+        format!("{}/", raw_name)
+    } else {
+        raw_name.clone()
+    };
+
+    let visible_len = display_raw.chars().count();
+
+    if visible_len <= NAME_COL_WIDTH {
+        // Pad to column width
+        let colored = format_name(entry);
+        let pad = NAME_COL_WIDTH - visible_len;
+        (format!("{}{}", colored, " ".repeat(pad)), NAME_COL_WIDTH)
+    } else {
+        // Truncate: keep extension visible for files
+        let truncated = if is_dir_entry {
+            let t: String = raw_name.chars().take(NAME_COL_WIDTH - 2).collect();
+            format!("{}…/", t)
+        } else if let Some(dot_pos) = raw_name.rfind('.') {
+            let ext = &raw_name[dot_pos..]; // includes dot
+            let ext_len = ext.chars().count();
+            if ext_len + 2 < NAME_COL_WIDTH {
+                let base_budget = NAME_COL_WIDTH - ext_len - 1; // 1 for ellipsis
+                let base: String = raw_name.chars().take(base_budget).collect();
+                format!("{}…{}", base, ext)
+            } else {
+                let t: String = raw_name.chars().take(NAME_COL_WIDTH - 1).collect();
+                format!("{}…", t)
+            }
+        } else {
+            let t: String = raw_name.chars().take(NAME_COL_WIDTH - 1).collect();
+            format!("{}…", t)
+        };
+
+        let colored = colorize_name(&truncated, entry);
+        (colored, NAME_COL_WIDTH)
+    }
+}
+
+/// Apply color to an arbitrary name string based on entry type.
+fn colorize_name(name: &str, entry: &DirEntry) -> String {
+    if entry.is_dir {
+        name.cyan().bold().to_string()
+    } else if entry.is_hidden {
+        name.dimmed().to_string()
+    } else if entry.is_md() {
+        name.white().bold().to_string()
+    } else if entry.is_txt() {
+        name.white().to_string()
+    } else {
+        name.dimmed().to_string()
+    }
+}
+
 /// List directory contents according to CLI options.
 pub fn list_directory(cli: &Cli) -> Result<(), String> {
     let path = &cli.path;
@@ -97,15 +159,19 @@ fn print_default(entries: &[DirEntry]) {
         .unwrap_or(80);
 
     for entry in entries {
-        let name = format_name(entry);
+        let (name_col, _) = format_name_column(entry);
         let summary = get_summary(entry);
 
-        let line = if entry.is_dir {
-            format!("{} {}", dir_icon(), name)
-        } else if summary.is_empty() {
-            format!("  {}", name)
+        let prefix = if entry.is_dir {
+            format!("{} ", dir_icon())
         } else {
-            format!("  {}  {}", name, summary)
+            "  ".to_string()
+        };
+
+        let line = if summary.is_empty() {
+            format!("{}{}", prefix, name_col.trim_end())
+        } else {
+            format!("{}{}  {}", prefix, name_col, summary)
         };
 
         println!("{}", truncate_visible(&line, term_width));
@@ -126,7 +192,7 @@ fn print_long(entries: &[DirEntry]) {
         .unwrap_or(4);
 
     for entry in entries {
-        let name = format_name(entry);
+        let (name_col, _) = format_name_column(entry);
         let size = format_size(entry.size);
         let time = entry
             .modified
@@ -148,7 +214,7 @@ fn print_long(entries: &[DirEntry]) {
                 prefix,
                 size.dimmed(),
                 time.dimmed(),
-                name,
+                name_col.trim_end(),
                 width = max_size_len
             )
         } else {
@@ -157,7 +223,7 @@ fn print_long(entries: &[DirEntry]) {
                 prefix,
                 size.dimmed(),
                 time.dimmed(),
-                name,
+                name_col,
                 summary,
                 width = max_size_len
             )
@@ -170,15 +236,15 @@ fn print_long(entries: &[DirEntry]) {
 /// Format the entry name with color.
 fn format_name(entry: &DirEntry) -> String {
     if entry.is_dir {
-        format!("{}/", entry.name.blue().bold())
+        format!("{}/", entry.name.cyan().bold())
     } else if entry.is_hidden {
         entry.name.dimmed().to_string()
     } else if entry.is_md() {
-        entry.name.green().to_string()
+        entry.name.white().bold().to_string()
     } else if entry.is_txt() {
         entry.name.white().to_string()
     } else {
-        entry.name.normal().to_string()
+        entry.name.dimmed().to_string()
     }
 }
 

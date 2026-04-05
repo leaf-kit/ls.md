@@ -12,7 +12,7 @@
 
 A markdown-aware directory listing tool for the terminal.
 
-> **v0.1.0 Released** — [GitHub Release](https://github.com/leaf-kit/ls.md/releases/tag/v0.1.0) | [Homebrew Tap](https://github.com/leaf-kit/homebrew-lsmd)
+> **v0.2.0 Released** — [GitHub Release](https://github.com/leaf-kit/ls.md/releases/tag/v0.2.0) | [Homebrew Tap](https://github.com/leaf-kit/homebrew-lsmd)
 >
 > ```bash
 > brew tap leaf-kit/lsmd && brew install lsmd

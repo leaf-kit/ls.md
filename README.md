@@ -71,7 +71,7 @@ With lsmd:
 > *Don't just list files. List meaning.*
 
 <p align="center">
-  <img src="images/lsmd.png" alt="lsmd screenshot" width="600" />
+  <img src="images/lsmd.png" alt="lsmd screenshot" width="100%" />
 </p>
 
 ## Features
@@ -281,7 +281,7 @@ Key behaviors:
 ### 2. Long Format (`-l`)
 
 <p align="center">
-  <img src="images/lsmd-l.png" alt="lsmd -l screenshot" width="600" />
+  <img src="images/lsmd-l.png" alt="lsmd -l screenshot" width="100%" />
 </p>
 
 ```

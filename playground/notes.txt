@@ -1,0 +1,4 @@
+Quick notes from today's brainstorming session about the new feature.
+- Consider adding search functionality
+- Look into fuzzy matching libraries
+- Performance target: < 50ms for 1000 files

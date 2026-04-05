@@ -1,0 +1,27 @@
+[package]
+name = "lsmd"
+version = "0.1.0"
+edition = "2021"
+description = "A markdown-aware directory listing tool"
+license = "MIT"
+repository = "https://github.com/leaf-kit/ls.md"
+
+[[bin]]
+name = "lsmd"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+colored = "2"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+walkdir = "2"
+terminal_size = "0.4"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
